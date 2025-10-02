@@ -1,0 +1,33 @@
+<div class="section">
+  <div class="section-header">
+    <h2><i class="fa-solid fa-calendar-check"></i> Assignments</h2>
+  </div>
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Vehicle</th>
+          <th>Inspector</th>
+          <th>Scheduled</th>
+          <th>Status</th>
+          <th>Remarks</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in assignments %}
+        <tr>
+          <td>#{{ a.id }}</td>
+          <td>{{ a.vehicle.license_plate }} • {{ a.vehicle.make }} {{ a.vehicle.model }}</td>
+          <td>{{ a.inspector.profile.user.get_full_name|default:a.inspector.profile.user.username }}</td>
+          <td>{{ a.scheduled_for|date:'M d, Y' }}</td>
+          <td><span class="status">{{ a.status }}</span></td>
+          <td>{{ a.remarks }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="muted">No assignments.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
