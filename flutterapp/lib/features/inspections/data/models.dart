@@ -386,21 +386,30 @@ class InspectionDetailItemModel {
   final String notes;
   final List<String> photoPaths;
 
-  factory InspectionDetailItemModel.fromJson(Map<String, dynamic> json) => InspectionDetailItemModel(
-        id: json['id'] as int,
-        checklistItem: ChecklistItemModel.fromJson(
-          (json['checklist_item_detail'] as Map<String, dynamic>? ?? <String, dynamic>{})
-            ..['category'] = (json['checklist_item_detail'] as Map<String, dynamic>? ?? <String, dynamic>{})['category'] ?? 0,
-        ),
-        result: json['result'] as String? ?? 'pass',
-        severity: json['severity'] as int? ?? 1,
-        notes: json['notes'] as String? ?? '',
-        photoPaths: (json['photos'] as List<dynamic>? ?? <dynamic>[])
-            .whereType<Map<String, dynamic>>()
-            .map((photo) => photo['image'] as String? ?? '')
-            .where((path) => path.isNotEmpty)
-            .toList(),
-      );
+  factory InspectionDetailItemModel.fromJson(Map<String, dynamic> json) {
+    final detail = json['checklist_item_detail'] as Map<String, dynamic>? ?? <String, dynamic>{};
+    final checklistJson = <String, dynamic>{
+      'id': detail['id'] ?? json['checklist_item'] ?? 0,
+      'category': detail['category'] ?? 0,
+      'category_name': detail['category_name'] ?? '',
+      'code': detail['code'] ?? '',
+      'title': detail['title'] ?? '',
+      'description': detail['description'] ?? '',
+      'requires_photo': detail['requires_photo'] ?? false,
+    };
+    return InspectionDetailItemModel(
+      id: json['id'] as int,
+      checklistItem: ChecklistItemModel.fromJson(checklistJson),
+      result: json['result'] as String? ?? 'pass',
+      severity: json['severity'] as int? ?? 1,
+      notes: json['notes'] as String? ?? '',
+      photoPaths: (json['photos'] as List<dynamic>? ?? <dynamic>[])
+          .whereType<Map<String, dynamic>>()
+          .map((photo) => photo['image'] as String? ?? '')
+          .where((path) => path.isNotEmpty)
+          .toList(),
+    );
+  }
 }
 
 class CustomerReportModel {
