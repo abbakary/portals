@@ -482,24 +482,34 @@ class InspectionDetailModel {
   final DateTime? completedAt;
   final CustomerReportModel? customerReport;
 
-  factory InspectionDetailModel.fromJson(Map<String, dynamic> json) => InspectionDetailModel(
-        id: json['id'] as int,
-        reference: json['reference'] as String? ?? '',
-        vehicle: VehicleModel.fromJson(json['vehicle'] as Map<String, dynamic>),
-        customer: CustomerModel.fromJson(json['customer'] as Map<String, dynamic>),
-        status: json['status'] as String? ?? '',
-        createdAt: DateTime.parse(json['created_at'] as String),
-        odometerReading: json['odometer_reading'] as int? ?? 0,
-        generalNotes: json['general_notes'] as String? ?? '',
-        responses: (json['item_responses'] as List<dynamic>? ?? <dynamic>[])
-            .whereType<Map<String, dynamic>>()
-            .map(InspectionDetailItemModel.fromJson)
-            .toList(),
-        inspectorId: json['inspector'] as int?,
-        startedAt: json['started_at'] != null ? DateTime.parse(json['started_at'] as String) : null,
-        completedAt: json['completed_at'] != null ? DateTime.parse(json['completed_at'] as String) : null,
-        customerReport: json['customer_report'] is Map<String, dynamic>
-            ? CustomerReportModel.fromJson(json['customer_report'] as Map<String, dynamic>)
-            : null,
-      );
+  factory InspectionDetailModel.fromJson(Map<String, dynamic> json) {
+    final vehicleField = json['vehicle'];
+    final vehicle = vehicleField is Map<String, dynamic>
+        ? VehicleModel.fromJson(vehicleField)
+        : VehicleModel.minimal(vehicleField as int? ?? 0);
+    final customerField = json['customer'];
+    final customer = customerField is Map<String, dynamic>
+        ? CustomerModel.fromJson(customerField)
+        : CustomerModel.minimal(customerField as int? ?? 0);
+    return InspectionDetailModel(
+      id: json['id'] as int,
+      reference: json['reference'] as String? ?? '',
+      vehicle: vehicle,
+      customer: customer,
+      status: json['status'] as String? ?? '',
+      createdAt: DateTime.parse(json['created_at'] as String),
+      odometerReading: json['odometer_reading'] as int? ?? 0,
+      generalNotes: json['general_notes'] as String? ?? '',
+      responses: (json['item_responses'] as List<dynamic>? ?? <dynamic>[])
+          .whereType<Map<String, dynamic>>()
+          .map(InspectionDetailItemModel.fromJson)
+          .toList(),
+      inspectorId: json['inspector'] as int?,
+      startedAt: json['started_at'] != null ? DateTime.parse(json['started_at'] as String) : null,
+      completedAt: json['completed_at'] != null ? DateTime.parse(json['completed_at'] as String) : null,
+      customerReport: json['customer_report'] is Map<String, dynamic>
+          ? CustomerReportModel.fromJson(json['customer_report'] as Map<String, dynamic>)
+          : null,
+    );
+  }
 }
