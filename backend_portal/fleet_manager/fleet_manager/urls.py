@@ -10,6 +10,8 @@ urlpatterns = [
     path('admin/', views_web.app_shell, name='portal-admin'),
     # Keep Django admin accessible at a different path
     path('django-admin/', admin.site.urls),
+    # Django auth (login/logout, password views)
+    path('accounts/', include('django.contrib.auth.urls')),
     path('api/', include('portal.urls')),
 ]
 
