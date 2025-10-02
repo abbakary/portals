@@ -5,6 +5,7 @@ from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
@@ -79,7 +80,9 @@ class VehicleViewSet(viewsets.ModelViewSet):
         return queryset.none()
 
     def get_permissions(self):
-        if self.action in ["create", "update", "partial_update", "destroy"]:
+        if self.action == "create":
+            return [IsAuthenticated(), IsInspectorOrAdmin()]
+        if self.action in ["update", "partial_update", "destroy"]:
             return [IsAuthenticated(), IsAdmin()]
         return super().get_permissions()
 
@@ -114,6 +117,7 @@ class VehicleAssignmentViewSet(viewsets.ModelViewSet):
 
 class InspectionViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     queryset = Inspection.objects.select_related(
         "vehicle",
         "vehicle__customer",

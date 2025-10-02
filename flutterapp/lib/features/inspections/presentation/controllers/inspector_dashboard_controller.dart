@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter/foundation.dart';
+
 import '../../../../core/exceptions/app_exception.dart';
 import '../../../auth/presentation/session_controller.dart';
 import '../../data/inspections_repository.dart';

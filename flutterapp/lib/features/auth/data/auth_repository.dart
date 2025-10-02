@@ -24,7 +24,10 @@ class AuthRepository {
       throw AppException('Authentication response missing token');
     }
     await _tokenStore.persistToken(data['token'] as String);
-    final profileJson = data['profile'] as Map<String, dynamic>;
+    final profileJson = data['profile'] as Map<String, dynamic>?;
+    if (profileJson == null) {
+      throw AppException('Authentication response missing profile');
+    }
     return PortalProfile.fromJson(profileJson);
   }
 

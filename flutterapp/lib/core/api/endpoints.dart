@@ -1,4 +1,6 @@
 class ApiEndpoints {
+  const ApiEndpoints._();
+
   static const login = 'auth/token/';
   static const customers = 'customers/';
   static const inspectors = 'inspectors/';
