@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Access denied</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    body{font-family:Inter,system-ui,Arial,sans-serif;display:grid;place-items:center;height:100vh;margin:0;background:#0f172a;color:#e2e8f0}
+    .box{background:#111827;padding:32px 28px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.35);max-width:520px}
+    .box h1{margin:0 0 8px;font-size:22px;font-weight:700}
+    .muted{color:#9ca3af}
+    a{color:#93c5fd}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1><i class="fa-solid fa-ban"></i> Access denied</h1>
+    <p class="muted">You do not have permission to access the admin portal. Please sign in with an admin account.</p>
+    <p><a href="/admin/login/?next=/api/app/">Sign in</a></p>
+  </div>
+</body>
+</html>
