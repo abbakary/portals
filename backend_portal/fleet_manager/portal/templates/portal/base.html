@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fleet Manager Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-pbDsX7A0Hch1n8w3l0C7zA8WcNQ2n3V0xv1t8qjN4uYQ6w4QvNn4V4nN9T3Vf0a7P5E3p4e0HfQ2YwLk3pO3Vw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <link rel="stylesheet" href="{% static 'portal/styles.css' %}">
+  <script defer src="{% static 'portal/app.js' %}"></script>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <i class="fa-solid fa-truck"></i>
+        <span>Fleet Admin</span>
+      </div>
+      <nav class="menu" id="sidebar-menu">
+        <a href="{% url 'portal-app' %}" hx-get="{% url 'portal-customers' %}" hx-target="#content" hx-push-url="true" data-route="/app/customers/">
+          <i class="fa-solid fa-building-user"></i><span>Customers</span>
+        </a>
+        <a href="{% url 'portal-app' %}" hx-get="{% url 'portal-vehicles' %}" hx-target="#content" hx-push-url="true" data-route="/app/vehicles/">
+          <i class="fa-solid fa-car"></i><span>Vehicles</span>
+        </a>
+        <a href="{% url 'portal-app' %}" hx-get="{% url 'portal-inspectors' %}" hx-target="#content" hx-push-url="true" data-route="/app/inspectors/">
+          <i class="fa-solid fa-user-shield"></i><span>Inspectors</span>
+        </a>
+        <a href="{% url 'portal-app' %}" hx-get="{% url 'portal-assignments' %}" hx-target="#content" hx-push-url="true" data-route="/app/assignments/">
+          <i class="fa-solid fa-calendar-check"></i><span>Assignments</span>
+        </a>
+        <a href="{% url 'portal-app' %}" hx-get="{% url 'portal-inspections' %}" hx-target="#content" hx-push-url="true" data-route="/app/inspections/">
+          <i class="fa-solid fa-clipboard-check"></i><span>Inspections</span>
+        </a>
+        <a href="{% url 'portal-app' %}" hx-get="{% url 'portal-categories' %}" hx-target="#content" hx-push-url="true" data-route="/app/categories/">
+          <i class="fa-solid fa-list-check"></i><span>Checklist</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user">
+          <i class="fa-regular fa-circle-user"></i>
+          <div>
+            <div class="name">{{ profile.user.get_full_name|default:profile.user.username }}</div>
+            <div class="role">Admin</div>
+          </div>
+        </div>
+        <a class="logout" href="/admin/logout/?next=/api/app/">
+          <i class="fa-solid fa-right-from-bracket"></i> Sign out
+        </a>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div class="title">
+          <i class="fa-solid fa-gauge-high"></i>
+          <span>Dashboard</span>
+        </div>
+      </header>
+      <section id="content" class="content">
+        {% block content %}{% endblock %}
+      </section>
+    </main>
+  </div>
+</body>
+</html>
