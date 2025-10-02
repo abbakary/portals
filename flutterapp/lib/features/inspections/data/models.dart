@@ -132,7 +132,7 @@ class ChecklistItemModel {
 
   factory ChecklistItemModel.fromJson(Map<String, dynamic> json) => ChecklistItemModel(
         id: json['id'] as int,
-        category: json['category'] as int,
+        category: json['category'] as int? ?? 0,
         categoryName: json['category_name'] as String? ?? '',
         code: json['code'] as String? ?? '',
         title: json['title'] as String? ?? '',
