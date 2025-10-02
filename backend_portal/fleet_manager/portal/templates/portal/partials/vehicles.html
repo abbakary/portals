@@ -1,0 +1,35 @@
+<div class="section">
+  <div class="section-header">
+    <h2><i class="fa-solid fa-car"></i> Vehicles</h2>
+  </div>
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Plate</th>
+          <th>VIN</th>
+          <th>Make/Model</th>
+          <th>Year</th>
+          <th>Customer</th>
+          <th>Mileage</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for v in vehicles %}
+        <tr>
+          <td>#{{ v.id }}</td>
+          <td>{{ v.license_plate }}</td>
+          <td class="mono">{{ v.vin }}</td>
+          <td>{{ v.make }} {{ v.model }}</td>
+          <td>{{ v.year }}</td>
+          <td>{{ v.customer.legal_name }}</td>
+          <td>{{ v.mileage }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="muted">No vehicles.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
