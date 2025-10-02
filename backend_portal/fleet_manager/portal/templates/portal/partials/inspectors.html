@@ -1,0 +1,31 @@
+<div class="section">
+  <div class="section-header">
+    <h2><i class="fa-solid fa-user-shield"></i> Inspectors</h2>
+  </div>
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Badge</th>
+          <th>Active</th>
+          <th>Certifications</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in inspectors %}
+        <tr>
+          <td>#{{ i.id }}</td>
+          <td>{{ i.profile.user.get_full_name|default:i.profile.user.username }}</td>
+          <td>{{ i.badge_id }}</td>
+          <td>{% if i.is_active %}<span class="status success">Active</span>{% else %}<span class="status muted">Inactive</span>{% endif %}</td>
+          <td>{{ i.certifications }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="muted">No inspectors.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
