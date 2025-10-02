@@ -26,3 +26,15 @@ class IsCustomer(BasePermission):
     def has_permission(self, request, view):
         profile = get_portal_profile(request.user)
         return bool(profile and profile.role == PortalUser.ROLE_CUSTOMER)
+
+
+class IsInspectorOrAdmin(BasePermission):
+    def has_permission(self, request, view):
+        profile = get_portal_profile(request.user)
+        return bool(profile and profile.role in [PortalUser.ROLE_INSPECTOR, PortalUser.ROLE_ADMIN])
+
+
+class IsCustomerOrAdmin(BasePermission):
+    def has_permission(self, request, view):
+        profile = get_portal_profile(request.user)
+        return bool(profile and profile.role in [PortalUser.ROLE_CUSTOMER, PortalUser.ROLE_ADMIN])
