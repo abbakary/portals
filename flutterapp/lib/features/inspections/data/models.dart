@@ -70,6 +70,16 @@ class CustomerModel {
             ? PortalProfile.fromJson(json['profile'] as Map<String, dynamic>)
             : null,
       );
+
+  factory CustomerModel.minimal(int id) => CustomerModel(
+        id: id,
+        legalName: '',
+        contactEmail: '',
+        contactPhone: '',
+        city: '',
+        state: '',
+        country: '',
+      );
 }
 
 class VehicleModel {
@@ -108,6 +118,17 @@ class VehicleModel {
         mileage: json['mileage'] as int? ?? 0,
         customerId: json['customer'] as int?,
         customerName: json['customer_display'] as String?,
+      );
+
+  factory VehicleModel.minimal(int id) => VehicleModel(
+        id: id,
+        licensePlate: '',
+        vin: '',
+        make: '',
+        model: '',
+        year: 0,
+        vehicleType: '',
+        mileage: 0,
       );
 }
 
