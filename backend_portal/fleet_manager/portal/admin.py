@@ -45,6 +45,14 @@ class VehicleAdmin(admin.ModelAdmin):
 @admin.register(models.VehicleAssignment)
 class VehicleAssignmentAdmin(admin.ModelAdmin):
     list_display = ("vehicle", "inspector", "scheduled_for", "status", "assigned_by")
+    search_fields = (
+        "vehicle__license_plate",
+        "vehicle__vin",
+        "inspector__badge_id",
+        "inspector__profile__user__username",
+        "assigned_by__user__username",
+        "status",
+    )
     autocomplete_fields = ("vehicle", "inspector", "assigned_by")
     list_filter = ("status", "scheduled_for")
 
