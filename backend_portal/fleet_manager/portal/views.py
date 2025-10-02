@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from django.db.models import Prefetch
-from rest_framework import mixins, status, viewsets
+from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -77,10 +77,11 @@ class VehicleViewSet(viewsets.ModelViewSet):
             return queryset.none()
         if profile.role == PortalUser.ROLE_ADMIN:
             return queryset
-        if profile.role == PortalUser.ROLE_CUSTOMER:
-            return queryset.filter(customer=profile.customer_profile)
-        if profile.role == PortalUser.ROLE_INSPECTOR:
-            inspector_profile = profile.inspector_profile
+        customer_profile = getattr(profile, "customer_profile", None)
+        if customer_profile:
+            return queryset.filter(customer=customer_profile)
+        inspector_profile = getattr(profile, "inspector_profile", None)
+        if inspector_profile:
             return queryset.filter(assignments__inspector=inspector_profile).distinct()
         return queryset.none()
 
@@ -107,8 +108,9 @@ class VehicleAssignmentViewSet(viewsets.ModelViewSet):
             return queryset.none()
         if profile.role == PortalUser.ROLE_ADMIN:
             return queryset
-        if profile.role == PortalUser.ROLE_INSPECTOR:
-            return queryset.filter(inspector=profile.inspector_profile)
+        inspector_profile = getattr(profile, "inspector_profile", None)
+        if inspector_profile:
+            return queryset.filter(inspector=inspector_profile)
         return queryset.none()
 
     def get_permissions(self):
@@ -146,16 +148,19 @@ class InspectionViewSet(viewsets.ModelViewSet):
         queryset = super().get_queryset()
         if profile.role == PortalUser.ROLE_ADMIN:
             return queryset
-        if profile.role == PortalUser.ROLE_INSPECTOR:
-            return queryset.filter(inspector=profile.inspector_profile)
-        if profile.role == PortalUser.ROLE_CUSTOMER:
-            return queryset.filter(customer=profile.customer_profile)
+        inspector_profile = getattr(profile, "inspector_profile", None)
+        if inspector_profile:
+            return queryset.filter(inspector=inspector_profile)
+        customer_profile = getattr(profile, "customer_profile", None)
+        if customer_profile:
+            return queryset.filter(customer=customer_profile)
         return queryset.none()
 
     def perform_create(self, serializer):
         profile = get_portal_profile(self.request.user)
-        if profile and profile.role == PortalUser.ROLE_INSPECTOR:
-            serializer.save(inspector=profile.inspector_profile)
+        inspector_profile = getattr(profile, "inspector_profile", None) if profile else None
+        if inspector_profile:
+            serializer.save(inspector=inspector_profile)
         else:
             serializer.save()
 
