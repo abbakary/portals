@@ -48,7 +48,7 @@ class _InspectorHomeView extends StatelessWidget {
               ),
             ],
           ),
-          floatingActionButton: controller.vehicles.isEmpty
+          floatingActionButton: controller.vehicles.isEmpty || controller.inspectorProfileId == null
               ? null
               : FloatingActionButton.extended(
                   icon: const Icon(Icons.add_task),
