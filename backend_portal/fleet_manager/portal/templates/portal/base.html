@@ -63,7 +63,10 @@
         <div class="topbar-actions">
           <button class="btn" hx-get="{% url 'portal-customers' %}" hx-target="#content"><i class="fa-solid fa-building-user"></i> Customers</button>
           <button class="btn" hx-get="{% url 'portal-vehicles' %}" hx-target="#content"><i class="fa-solid fa-car"></i> Vehicles</button>
+          <button class="btn" hx-get="{% url 'portal-inspectors' %}" hx-target="#content"><i class="fa-solid fa-user-shield"></i> Inspectors</button>
+          <button class="btn" hx-get="{% url 'portal-assignments' %}" hx-target="#content"><i class="fa-solid fa-calendar-check"></i> Assignments</button>
           <button class="btn" hx-get="{% url 'portal-inspections' %}" hx-target="#content"><i class="fa-solid fa-clipboard-check"></i> Inspections</button>
+          <button class="btn" hx-get="{% url 'portal-categories' %}" hx-target="#content"><i class="fa-solid fa-list-check"></i> Checklist</button>
         </div>
       </header>
       <section id="content" class="content">

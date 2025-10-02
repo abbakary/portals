@@ -1,6 +1,11 @@
 <div class="section">
   <div class="section-header">
     <h2><i class="fa-solid fa-list-check"></i> Checklist Categories</h2>
+    <div class="section-actions">
+      <a class="btn btn-primary" href="/django-admin/portal/inspectioncategory/add/"><i class="fa-solid fa-plus"></i> New Category</a>
+      <a class="btn" href="/django-admin/portal/inspectioncategory/"><i class="fa-solid fa-gear"></i> Manage Categories</a>
+      <a class="btn" href="/django-admin/portal/checklistitem/"><i class="fa-solid fa-list"></i> Manage Items</a>
+    </div>
   </div>
   {% for cat in categories %}
   <div class="card">
