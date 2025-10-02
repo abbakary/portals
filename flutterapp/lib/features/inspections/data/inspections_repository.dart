@@ -103,7 +103,12 @@ class InspectionsRepository {
     final payload = draft.toOfflinePayload();
     final formData = await _formDataFromPayload(payload);
     try {
-      await _apiClient.post<dynamic>(ApiEndpoints.inspections, data: formData);
+      final response = await _apiClient.post<dynamic>(ApiEndpoints.inspections, data: formData);
+      final data = response.data;
+      if (data is Map<String, dynamic> && data['id'] is int) {
+        final id = data['id'] as int;
+        await _apiClient.post<dynamic>('${ApiEndpoints.inspections}$id/${ApiEndpoints.inspectionSubmit}');
+      }
       return const InspectionSubmissionResult(status: InspectionSubmissionStatus.submitted);
     } on AppException catch (error) {
       await _offlineQueueService.enqueueInspection(payload);
@@ -117,7 +122,12 @@ class InspectionsRepository {
     for (final payload in pending) {
       try {
         final formData = await _formDataFromPayload(payload);
-        await _apiClient.post<dynamic>(ApiEndpoints.inspections, data: formData);
+        final response = await _apiClient.post<dynamic>(ApiEndpoints.inspections, data: formData);
+        final data = response.data;
+        if (data is Map<String, dynamic> && data['id'] is int) {
+          final id = data['id'] as int;
+          await _apiClient.post<dynamic>('${ApiEndpoints.inspections}$id/${ApiEndpoints.inspectionSubmit}');
+        }
         await _offlineQueueService.clearInspection(payload);
         processed += 1;
       } on AppException {
