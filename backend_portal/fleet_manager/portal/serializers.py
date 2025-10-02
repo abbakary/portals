@@ -63,15 +63,13 @@ class PortalUserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_data = validated_data.pop("user")
-        user = User.objects.create(**user_data)
+        user = UserSerializer().create(user_data)
         return PortalUser.objects.create(user=user, **validated_data)
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop("user", None)
         if user_data:
-            for key, value in user_data.items():
-                setattr(instance.user, key, value)
-            instance.user.save()
+            UserSerializer().update(instance.user, user_data)
         return super().update(instance, validated_data)
 
 
