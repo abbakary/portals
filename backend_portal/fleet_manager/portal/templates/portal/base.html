@@ -14,8 +14,8 @@
   <script defer src="{% static 'portal/app.js' %}"></script>
 </head>
 <body>
-  <div class="layout">
-    <aside class="sidebar">
+  <div class="layout light">
+    <aside class="sidebar light">
       <div class="brand">
         <i class="fa-solid fa-truck"></i>
         <span>Fleet Admin</span>
@@ -48,16 +48,22 @@
             <div class="role">Admin</div>
           </div>
         </div>
-        <a class="logout" href="/admin/logout/?next=/api/app/">
+        <a class="logout" href="/django-admin/logout/?next=/admin/">
           <i class="fa-solid fa-right-from-bracket"></i> Sign out
         </a>
       </div>
     </aside>
     <main class="main">
-      <header class="topbar">
+      <canvas id="bg-particles" aria-hidden="true"></canvas>
+      <header class="topbar light">
         <div class="title">
           <i class="fa-solid fa-gauge-high"></i>
           <span>Dashboard</span>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn" hx-get="{% url 'portal-customers' %}" hx-target="#content"><i class="fa-solid fa-building-user"></i> Customers</button>
+          <button class="btn" hx-get="{% url 'portal-vehicles' %}" hx-target="#content"><i class="fa-solid fa-car"></i> Vehicles</button>
+          <button class="btn" hx-get="{% url 'portal-inspections' %}" hx-target="#content"><i class="fa-solid fa-clipboard-check"></i> Inspections</button>
         </div>
       </header>
       <section id="content" class="content">
