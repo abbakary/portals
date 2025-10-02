@@ -29,6 +29,19 @@ class ApiClient {
   final Dio _dio;
   final TokenStore _tokenStore;
 
+  String get baseUrl => _dio.options.baseUrl;
+
+  String resolveUrl(String path) {
+    if (path.isEmpty) {
+      return baseUrl;
+    }
+    final uri = Uri.parse(baseUrl);
+    if (path.startsWith('http')) {
+      return path;
+    }
+    return uri.resolve(path).toString();
+  }
+
   Future<Response<T>> get<T>(String path, {Map<String, dynamic>? queryParameters}) async {
     try {
       return await _dio.get<T>(path, queryParameters: queryParameters);
