@@ -3,7 +3,7 @@ from __future__ import annotations
 from django.db.models import Prefetch
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -19,7 +19,14 @@ from .models import (
     Vehicle,
     VehicleAssignment,
 )
-from .permissions import IsAdmin, IsCustomer, IsInspector, get_portal_profile
+from .permissions import (
+    IsAdmin,
+    IsCustomer,
+    IsCustomerOrAdmin,
+    IsInspector,
+    IsInspectorOrAdmin,
+    get_portal_profile,
+)
 from .serializers import (
     ChecklistItemSerializer,
     CustomerSerializer,
@@ -50,22 +57,18 @@ class AuthTokenView(ObtainAuthToken):
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.select_related("profile", "profile__user").all()
     serializer_class = CustomerSerializer
-    permission_classes = [IsAdmin]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
 
 class InspectorProfileViewSet(viewsets.ModelViewSet):
     queryset = InspectorProfile.objects.select_related("profile", "profile__user").all()
     serializer_class = InspectorProfileSerializer
-    permission_classes = [IsAdmin]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
 
 class VehicleViewSet(viewsets.ModelViewSet):
     serializer_class = VehicleSerializer
-
-    def get_permissions(self):
-        if self.action in ["list", "retrieve"]:
-            return [IsAdmin() if isinstance(get_portal_profile(self.request.user), PortalUser) and get_portal_profile(self.request.user).role == PortalUser.ROLE_ADMIN else AllowAny()]  # type: ignore
-        return [IsAdmin()]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         profile = get_portal_profile(self.request.user)
@@ -81,14 +84,15 @@ class VehicleViewSet(viewsets.ModelViewSet):
             return queryset.filter(assignments__inspector=inspector_profile).distinct()
         return queryset.none()
 
+    def get_permissions(self):
+        if self.action in ["create", "update", "partial_update", "destroy"]:
+            return [IsAuthenticated(), IsAdmin()]
+        return super().get_permissions()
+
 
 class VehicleAssignmentViewSet(viewsets.ModelViewSet):
     serializer_class = VehicleAssignmentSerializer
-
-    def get_permissions(self):
-        if self.action in ["list", "retrieve"]:
-            return [IsAdmin()|IsInspector()]  # type: ignore
-        return [IsAdmin()]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         profile = get_portal_profile(self.request.user)
@@ -107,8 +111,14 @@ class VehicleAssignmentViewSet(viewsets.ModelViewSet):
             return queryset.filter(inspector=profile.inspector_profile)
         return queryset.none()
 
+    def get_permissions(self):
+        if self.action in ["create", "update", "partial_update", "destroy"]:
+            return [IsAuthenticated(), IsAdmin()]
+        return [IsAuthenticated(), IsInspectorOrAdmin()]
+
 
 class InspectionViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
     queryset = Inspection.objects.select_related(
         "vehicle",
         "vehicle__customer",
@@ -149,7 +159,7 @@ class InspectionViewSet(viewsets.ModelViewSet):
         else:
             serializer.save()
 
-    @action(detail=True, methods=["post"], permission_classes=[IsAdmin | IsInspector])  # type: ignore
+    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated, IsInspectorOrAdmin])
     def submit(self, request, pk=None):
         inspection = self.get_object()
         inspection.status = Inspection.STATUS_SUBMITTED
@@ -158,7 +168,7 @@ class InspectionViewSet(viewsets.ModelViewSet):
         generate_customer_report(inspection)
         return Response(InspectionSerializer(inspection).data)
 
-    @action(detail=True, methods=["post"], permission_classes=[IsAdmin])
+    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated, IsAdmin])
     def approve(self, request, pk=None):
         inspection = self.get_object()
         inspection.status = Inspection.STATUS_APPROVED
