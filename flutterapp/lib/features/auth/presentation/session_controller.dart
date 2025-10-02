@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../../core/exceptions/app_exception.dart';
 import '../../inspections/data/models.dart';
