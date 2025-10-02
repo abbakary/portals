@@ -389,13 +389,13 @@ class InspectionDetailItemModel {
   factory InspectionDetailItemModel.fromJson(Map<String, dynamic> json) {
     final detail = json['checklist_item_detail'] as Map<String, dynamic>? ?? <String, dynamic>{};
     final checklistJson = <String, dynamic>{
-      'id': detail['id'] ?? json['checklist_item'] ?? 0,
-      'category': detail['category'] ?? 0,
-      'category_name': detail['category_name'] ?? '',
-      'code': detail['code'] ?? '',
-      'title': detail['title'] ?? '',
-      'description': detail['description'] ?? '',
-      'requires_photo': detail['requires_photo'] ?? false,
+      'id': detail['id'] as int? ?? json['checklist_item'] as int? ?? 0,
+      'category': detail['category'] as int? ?? 0,
+      'category_name': detail['category_name'] as String? ?? '',
+      'code': detail['code'] as String? ?? '',
+      'title': detail['title'] as String? ?? '',
+      'description': detail['description'] as String? ?? '',
+      'requires_photo': detail['requires_photo'] as bool? ?? false,
     };
     return InspectionDetailItemModel(
       id: json['id'] as int,
