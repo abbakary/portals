@@ -21,7 +21,13 @@ def app_shell(request: HttpRequest) -> HttpResponse:
     profile = _require_admin(request)
     if not profile:
         return render(request, "portal/forbidden.html", status=403)
-    context = {"profile": profile}
+    context = {
+        "profile": profile,
+        "kpi_customers": Customer.objects.count(),
+        "kpi_vehicles": Vehicle.objects.count(),
+        "kpi_inspectors": InspectorProfile.objects.count(),
+        "kpi_inspections": Inspection.objects.count(),
+    }
     return render(request, "portal/dashboard.html", context)
 
 

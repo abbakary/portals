@@ -1,14 +1,63 @@
 {% extends 'portal/base.html' %}
 {% load static %}
 {% block content %}
-<div class="cards">
-  <div class="card"><div class="card-title"><i class="fa-solid fa-building-user"></i> Customers</div><div class="card-value">—</div></div>
-  <div class="card"><div class="card-title"><i class="fa-solid fa-car"></i> Vehicles</div><div class="card-value">—</div></div>
-  <div class="card"><div class="card-title"><i class="fa-solid fa-user-shield"></i> Inspectors</div><div class="card-value">—</div></div>
-  <div class="card"><div class="card-title"><i class="fa-solid fa-clipboard-check"></i> Inspections</div><div class="card-value">—</div></div>
+<div class="kpi-grid">
+  <div class="kpi-card gradient-blue">
+    <div class="kpi-icon"><i class="fa-solid fa-building-user"></i></div>
+    <div class="kpi-info">
+      <div class="kpi-label">Customers</div>
+      <div class="kpi-value">{{ kpi_customers }}</div>
+    </div>
+    <div class="kpi-actions">
+      <a class="btn btn-primary" href="/django-admin/portal/customer/add/"><i class="fa-solid fa-plus"></i> Add</a>
+      <a class="btn" href="/django-admin/portal/customer/"><i class="fa-solid fa-gear"></i> Manage</a>
+      <button class="btn" hx-get="{% url 'portal-customers' %}" hx-target="#content"><i class="fa-solid fa-eye"></i> View</button>
+    </div>
+  </div>
+  <div class="kpi-card gradient-green">
+    <div class="kpi-icon"><i class="fa-solid fa-car"></i></div>
+    <div class="kpi-info">
+      <div class="kpi-label">Vehicles</div>
+      <div class="kpi-value">{{ kpi_vehicles }}</div>
+    </div>
+    <div class="kpi-actions">
+      <a class="btn btn-primary" href="/django-admin/portal/vehicle/add/"><i class="fa-solid fa-plus"></i> Add</a>
+      <a class="btn" href="/django-admin/portal/vehicle/"><i class="fa-solid fa-gear"></i> Manage</a>
+      <button class="btn" hx-get="{% url 'portal-vehicles' %}" hx-target="#content"><i class="fa-solid fa-eye"></i> View</button>
+    </div>
+  </div>
+  <div class="kpi-card gradient-purple">
+    <div class="kpi-icon"><i class="fa-solid fa-user-shield"></i></div>
+    <div class="kpi-info">
+      <div class="kpi-label">Inspectors</div>
+      <div class="kpi-value">{{ kpi_inspectors }}</div>
+    </div>
+    <div class="kpi-actions">
+      <a class="btn btn-primary" href="/django-admin/portal/inspectorprofile/add/"><i class="fa-solid fa-plus"></i> Add</a>
+      <a class="btn" href="/django-admin/portal/inspectorprofile/"><i class="fa-solid fa-gear"></i> Manage</a>
+      <button class="btn" hx-get="{% url 'portal-inspectors' %}" hx-target="#content"><i class="fa-solid fa-eye"></i> View</button>
+    </div>
+  </div>
+  <div class="kpi-card gradient-orange">
+    <div class="kpi-icon"><i class="fa-solid fa-clipboard-check"></i></div>
+    <div class="kpi-info">
+      <div class="kpi-label">Inspections</div>
+      <div class="kpi-value">{{ kpi_inspections }}</div>
+    </div>
+    <div class="kpi-actions">
+      <a class="btn btn-primary" href="/django-admin/portal/inspection/add/"><i class="fa-solid fa-plus"></i> Add</a>
+      <a class="btn" href="/django-admin/portal/inspection/"><i class="fa-solid fa-gear"></i> Manage</a>
+      <button class="btn" hx-get="{% url 'portal-inspections' %}" hx-target="#content"><i class="fa-solid fa-eye"></i> View</button>
+    </div>
+  </div>
 </div>
-<div class="welcome">
-  <h2>Welcome</h2>
-  <p>Select a section from the sidebar to manage data. Content loads without full page refresh.</p>
+
+<div class="welcome light">
+  <h2><i class="fa-solid fa-gauge-high"></i> Quick start</h2>
+  <p>Use the sidebar or the buttons above to manage your fleet data. Content loads instantly without leaving this page.</p>
+  <div class="quick-links">
+    <button class="btn btn-ghost" hx-get="{% url 'portal-assignments' %}" hx-target="#content"><i class="fa-solid fa-calendar-check"></i> View Assignments</button>
+    <button class="btn btn-ghost" hx-get="{% url 'portal-categories' %}" hx-target="#content"><i class="fa-solid fa-list-check"></i> Checklist</button>
+  </div>
 </div>
 {% endblock %}
