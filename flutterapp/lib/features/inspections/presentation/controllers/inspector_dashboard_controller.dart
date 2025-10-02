@@ -118,8 +118,8 @@ class InspectorDashboardController extends ChangeNotifier {
     }
   }
 
-  void signOut() {
-    sessionController.logout();
+  Future<void> signOut() {
+    return sessionController.logout();
   }
 
   int? _resolveInspectorId(List<VehicleAssignmentModel> assignments, List<InspectionSummaryModel> inspections) {
