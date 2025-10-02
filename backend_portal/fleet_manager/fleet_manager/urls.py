@@ -3,9 +3,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+from portal import views_web
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # Custom admin portal (templates-based)
+    path('admin/', views_web.app_shell, name='portal-admin'),
+    # Keep Django admin accessible at a different path
+    path('django-admin/', admin.site.urls),
     path('api/', include('portal.urls')),
 ]
 
