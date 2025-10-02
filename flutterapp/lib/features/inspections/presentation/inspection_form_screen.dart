@@ -465,9 +465,9 @@ class _ChecklistItemEditor extends StatelessWidget {
           const SizedBox(height: 16),
           SegmentedButton<String>(
             segments: const [
-              ButtonSegment(value: InspectionItemResponse.RESULT_PASS, label: Text('Pass'), icon: Icon(Icons.check_circle_outline)),
-              ButtonSegment(value: InspectionItemResponse.RESULT_FAIL, label: Text('Fail'), icon: Icon(Icons.error_outline)),
-              ButtonSegment(value: InspectionItemResponse.RESULT_NA, label: Text('N/A'), icon: Icon(Icons.help_outline)),
+              const ButtonSegment(value: InspectionItemResponse.RESULT_PASS, label: Text('Pass'), icon: Icon(Icons.check_circle_outline)),
+              const ButtonSegment(value: InspectionItemResponse.RESULT_FAIL, label: Text('Fail'), icon: Icon(Icons.error_outline)),
+              const ButtonSegment(value: InspectionItemResponse.RESULT_NA, label: Text('N/A'), icon: Icon(Icons.help_outline)),
             ],
             selected: <String>{response.result},
             onSelectionChanged: (values) => onResultChanged(values.first),

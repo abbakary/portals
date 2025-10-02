@@ -190,6 +190,12 @@ class InspectionCategoryModel {
       );
 }
 
+class InspectionItemResponse {
+  static const String RESULT_PASS = 'pass';
+  static const String RESULT_FAIL = 'fail';
+  static const String RESULT_NA = 'not_applicable';
+}
+
 class InspectionItemModel {
   InspectionItemModel({
     required this.checklistItemId,
