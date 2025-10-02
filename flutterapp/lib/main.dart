@@ -15,7 +15,7 @@ import 'features/inspections/presentation/inspector_home_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final config = AppConfig.dev;
+  final config = AppConfig.current;
   final tokenStore = TokenStore();
   final apiClient = ApiClient(config: config, tokenStore: tokenStore);
   final offlineQueue = await OfflineQueueService.init();
