@@ -44,7 +44,8 @@ class InspectorDashboardController extends ChangeNotifier {
       final vehicles = await repository.fetchVehicles();
       final categories = await repository.fetchCategories();
       final inspections = await repository.fetchInspections();
-      _assignments = assignments;
+      final today = DateTime.now();
+      _assignments = assignments.where((a) => _isSameDate(a.scheduledFor, today)).toList();
       _vehicles = vehicles;
       _categories = categories;
       _recentInspections = inspections;
