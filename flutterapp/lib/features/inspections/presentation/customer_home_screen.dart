@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../data/inspections_repository.dart';
 import '../data/models.dart';
+import 'controllers/customer_dashboard_controller.dart';
 import '../../../core/ui/animated_background.dart';
 
 class CustomerHomeScreen extends StatelessWidget {
