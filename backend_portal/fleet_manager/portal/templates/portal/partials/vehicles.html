@@ -2,8 +2,8 @@
   <div class="section-header">
     <h2><i class="fa-solid fa-car"></i> Vehicles</h2>
     <div class="section-actions">
-      <a class="btn btn-primary" href="/django-admin/portal/vehicle/add/"><i class="fa-solid fa-plus"></i> Add</a>
-      <a class="btn" href="/django-admin/portal/vehicle/"><i class="fa-solid fa-gear"></i> Manage</a>
+      <button class="btn btn-primary" hx-get="{% url 'portal-vehicles-new' %}" hx-target="#content"><i class="fa-solid fa-plus"></i> Add</button>
+      <button class="btn" hx-get="{% url 'portal-vehicles' %}" hx-target="#content"><i class="fa-solid fa-gear"></i> Refresh</button>
     </div>
   </div>
   <div class="table-responsive">
@@ -17,6 +17,7 @@
           <th>Year</th>
           <th>Customer</th>
           <th>Mileage</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -29,6 +30,13 @@
           <td>{{ v.year }}</td>
           <td>{{ v.customer.legal_name }}</td>
           <td>{{ v.mileage }}</td>
+          <td>
+            <button class="btn" hx-get="{% url 'portal-vehicles-edit' v.id %}" hx-target="#content"><i class="fa-solid fa-pen"></i> Edit</button>
+            <form method="post" hx-post="{% url 'portal-vehicles-delete' v.id %}" hx-target="#content" style="display:inline-block">
+              {% csrf_token %}
+              <button class="btn" type="submit" onclick="return confirm('Delete this vehicle?')"><i class="fa-solid fa-trash"></i> Delete</button>
+            </form>
+          </td>
         </tr>
         {% empty %}
         <tr><td colspan="7" class="muted">No vehicles.</td></tr>

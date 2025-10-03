@@ -2,8 +2,8 @@
   <div class="section-header">
     <h2><i class="fa-solid fa-calendar-check"></i> Assignments</h2>
     <div class="section-actions">
-      <a class="btn btn-primary" href="/django-admin/portal/vehicleassignment/add/"><i class="fa-solid fa-plus"></i> Add</a>
-      <a class="btn" href="/django-admin/portal/vehicleassignment/"><i class="fa-solid fa-gear"></i> Manage</a>
+      <button class="btn btn-primary" hx-get="{% url 'portal-assignments-new' %}" hx-target="#content"><i class="fa-solid fa-plus"></i> Add</button>
+      <button class="btn" hx-get="{% url 'portal-assignments' %}" hx-target="#content"><i class="fa-solid fa-gear"></i> Refresh</button>
     </div>
   </div>
   <div class="table-responsive">
@@ -16,6 +16,7 @@
           <th>Scheduled</th>
           <th>Status</th>
           <th>Remarks</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -27,6 +28,13 @@
           <td>{{ a.scheduled_for|date:'M d, Y' }}</td>
           <td><span class="status">{{ a.status }}</span></td>
           <td>{{ a.remarks }}</td>
+          <td>
+            <button class="btn" hx-get="{% url 'portal-assignments-edit' a.id %}" hx-target="#content"><i class="fa-solid fa-pen"></i> Edit</button>
+            <form method="post" hx-post="{% url 'portal-assignments-delete' a.id %}" hx-target="#content" style="display:inline-block">
+              {% csrf_token %}
+              <button class="btn" type="submit" onclick="return confirm('Delete this assignment?')"><i class="fa-solid fa-trash"></i> Delete</button>
+            </form>
+          </td>
         </tr>
         {% empty %}
         <tr><td colspan="6" class="muted">No assignments.</td></tr>

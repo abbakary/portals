@@ -1,0 +1,56 @@
+<div class="section-header">
+  <h2><i class="fa-solid fa-building-user"></i> {% if object %}Edit{% else %}New{% endif %} Customer</h2>
+</div>
+<form class="form" hx-post="{{ request.path }}" hx-target="#content">
+  {% csrf_token %}
+  <div class="form-grid">
+    <div class="field">
+      <label for="id_profile">Portal Profile</label>
+      {{ form.profile }}
+    </div>
+    <div class="field">
+      <label for="id_legal_name">Legal name</label>
+      {{ form.legal_name }}
+    </div>
+    <div class="field">
+      <label for="id_contact_email">Email</label>
+      {{ form.contact_email }}
+    </div>
+    <div class="field">
+      <label for="id_contact_phone">Phone</label>
+      {{ form.contact_phone }}
+    </div>
+    <div class="field">
+      <label for="id_address_line1">Address line 1</label>
+      {{ form.address_line1 }}
+    </div>
+    <div class="field">
+      <label for="id_address_line2">Address line 2</label>
+      {{ form.address_line2 }}
+    </div>
+    <div class="field">
+      <label for="id_city">City</label>
+      {{ form.city }}
+    </div>
+    <div class="field">
+      <label for="id_state">State</label>
+      {{ form.state }}
+    </div>
+    <div class="field">
+      <label for="id_postal_code">Postal Code</label>
+      {{ form.postal_code }}
+    </div>
+    <div class="field">
+      <label for="id_country">Country</label>
+      {{ form.country }}
+    </div>
+    <div class="field" style="grid-column:1/-1">
+      <label for="id_notes">Notes</label>
+      {{ form.notes }}
+    </div>
+  </div>
+  <div class="actions">
+    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+    <button type="button" class="btn" hx-get="{% url 'portal-customers' %}" hx-target="#content">Cancel</button>
+  </div>
+</form>

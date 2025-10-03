@@ -2,14 +2,22 @@
   <div class="section-header">
     <h2><i class="fa-solid fa-list-check"></i> Checklist Categories</h2>
     <div class="section-actions">
-      <a class="btn btn-primary" href="/django-admin/portal/inspectioncategory/add/"><i class="fa-solid fa-plus"></i> New Category</a>
-      <a class="btn" href="/django-admin/portal/inspectioncategory/"><i class="fa-solid fa-gear"></i> Manage Categories</a>
-      <a class="btn" href="/django-admin/portal/checklistitem/"><i class="fa-solid fa-list"></i> Manage Items</a>
+      <button class="btn btn-primary" hx-get="{% url 'portal-categories-new' %}" hx-target="#content"><i class="fa-solid fa-plus"></i> New Category</button>
+      <button class="btn" hx-get="{% url 'portal-categories' %}" hx-target="#content"><i class="fa-solid fa-gear"></i> Refresh</button>
+      <button class="btn" hx-get="{% url 'portal-categories' %}" hx-target="#content"><i class="fa-solid fa-list"></i> Items</button>
     </div>
   </div>
   {% for cat in categories %}
   <div class="card">
     <div class="card-title">{{ cat.name }} <span class="muted mono">({{ cat.code }})</span></div>
+    <div class="section-actions" style="margin-top:8px">
+      <button class="btn" hx-get="{% url 'portal-categories-edit' cat.id %}" hx-target="#content"><i class="fa-solid fa-pen"></i> Edit Category</button>
+      <form method="post" hx-post="{% url 'portal-categories-delete' cat.id %}" hx-target="#content" style="display:inline-block">
+        {% csrf_token %}
+        <button class="btn" type="submit" onclick="return confirm('Delete this category?')"><i class="fa-solid fa-trash"></i> Delete</button>
+      </form>
+      <button class="btn btn-primary" hx-get="{% url 'portal-checklist-items-new' %}?category={{ cat.id }}" hx-target="#content"><i class="fa-solid fa-plus"></i> Add Item</button>
+    </div>
     <div class="card-body">
       <p class="muted">{{ cat.description }}</p>
       <div class="table-responsive">
@@ -21,6 +29,7 @@
               <th>Title</th>
               <th>Description</th>
               <th>Photo</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -31,6 +40,13 @@
               <td>{{ item.title }}</td>
               <td>{{ item.description }}</td>
               <td>{% if item.requires_photo %}<i class="fa-solid fa-camera"></i>{% else %}—{% endif %}</td>
+              <td>
+                <button class="btn" hx-get="{% url 'portal-checklist-items-edit' item.id %}" hx-target="#content"><i class="fa-solid fa-pen"></i> Edit</button>
+                <form method="post" hx-post="{% url 'portal-checklist-items-delete' item.id %}" hx-target="#content" style="display:inline-block">
+                  {% csrf_token %}
+                  <button class="btn" type="submit" onclick="return confirm('Delete this item?')"><i class="fa-solid fa-trash"></i> Delete</button>
+                </form>
+              </td>
             </tr>
             {% empty %}
             <tr><td colspan="5" class="muted">No items.</td></tr>

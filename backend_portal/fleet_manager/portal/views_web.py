@@ -1,9 +1,18 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpRequest, HttpResponse
 
-from .models import Customer, Vehicle, InspectorProfile, VehicleAssignment, Inspection, InspectionCategory
+from .models import Customer, Vehicle, InspectorProfile, VehicleAssignment, Inspection, InspectionCategory, ChecklistItem
 from .permissions import get_portal_profile, PortalUser
+from .forms import (
+    CustomerForm,
+    VehicleForm,
+    InspectorProfileForm,
+    VehicleAssignmentForm,
+    InspectionForm,
+    InspectionCategoryForm,
+    ChecklistItemForm,
+)
 
 
 def _require_admin(request: HttpRequest) -> PortalUser | None:
@@ -93,3 +102,315 @@ def categories_view(request: HttpRequest) -> HttpResponse:
         return render(request, "portal/forbidden.html", status=403)
     categories = InspectionCategory.objects.prefetch_related("items").order_by("display_order")
     return render(request, "portal/partials/categories.html", {"categories": categories})
+
+
+# ------- Customers -------
+@login_required
+def customer_create(request: HttpRequest) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    if request.method == "POST":
+        form = CustomerForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return customers_view(request)
+    else:
+        form = CustomerForm()
+    return render(request, "portal/forms/customer_form.html", {"form": form})
+
+
+@login_required
+def customer_edit(request: HttpRequest, pk: int) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    obj = get_object_or_404(Customer, pk=pk)
+    if request.method == "POST":
+        form = CustomerForm(request.POST, instance=obj)
+        if form.is_valid():
+            form.save()
+            return customers_view(request)
+    else:
+        form = CustomerForm(instance=obj)
+    return render(request, "portal/forms/customer_form.html", {"form": form, "object": obj})
+
+
+@login_required
+def customer_delete(request: HttpRequest, pk: int) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    obj = get_object_or_404(Customer, pk=pk)
+    if request.method == "POST":
+        obj.delete()
+    return customers_view(request)
+
+
+# ------- Vehicles -------
+@login_required
+def vehicle_create(request: HttpRequest) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    if request.method == "POST":
+        form = VehicleForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return vehicles_view(request)
+    else:
+        form = VehicleForm()
+    return render(request, "portal/forms/vehicle_form.html", {"form": form})
+
+
+@login_required
+def vehicle_edit(request: HttpRequest, pk: int) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    obj = get_object_or_404(Vehicle, pk=pk)
+    if request.method == "POST":
+        form = VehicleForm(request.POST, instance=obj)
+        if form.is_valid():
+            form.save()
+            return vehicles_view(request)
+    else:
+        form = VehicleForm(instance=obj)
+    return render(request, "portal/forms/vehicle_form.html", {"form": form, "object": obj})
+
+
+@login_required
+def vehicle_delete(request: HttpRequest, pk: int) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    obj = get_object_or_404(Vehicle, pk=pk)
+    if request.method == "POST":
+        obj.delete()
+    return vehicles_view(request)
+
+
+# ------- Inspectors -------
+@login_required
+def inspector_create(request: HttpRequest) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    if request.method == "POST":
+        form = InspectorProfileForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return inspectors_view(request)
+    else:
+        form = InspectorProfileForm()
+    return render(request, "portal/forms/inspector_form.html", {"form": form})
+
+
+@login_required
+def inspector_edit(request: HttpRequest, pk: int) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    obj = get_object_or_404(InspectorProfile, pk=pk)
+    if request.method == "POST":
+        form = InspectorProfileForm(request.POST, instance=obj)
+        if form.is_valid():
+            form.save()
+            return inspectors_view(request)
+    else:
+        form = InspectorProfileForm(instance=obj)
+    return render(request, "portal/forms/inspector_form.html", {"form": form, "object": obj})
+
+
+@login_required
+def inspector_delete(request: HttpRequest, pk: int) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    obj = get_object_or_404(InspectorProfile, pk=pk)
+    if request.method == "POST":
+        obj.delete()
+    return inspectors_view(request)
+
+
+# ------- Assignments -------
+@login_required
+def assignment_create(request: HttpRequest) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    if request.method == "POST":
+        form = VehicleAssignmentForm(request.POST)
+        if form.is_valid():
+            assignment = form.save(commit=False)
+            assignment.assigned_by = profile
+            assignment.save()
+            return assignments_view(request)
+    else:
+        form = VehicleAssignmentForm()
+    return render(request, "portal/forms/assignment_form.html", {"form": form})
+
+
+@login_required
+def assignment_edit(request: HttpRequest, pk: int) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    obj = get_object_or_404(VehicleAssignment, pk=pk)
+    if request.method == "POST":
+        form = VehicleAssignmentForm(request.POST, instance=obj)
+        if form.is_valid():
+            assignment = form.save(commit=False)
+            assignment.assigned_by = assignment.assigned_by or profile
+            assignment.save()
+            return assignments_view(request)
+    else:
+        form = VehicleAssignmentForm(instance=obj)
+    return render(request, "portal/forms/assignment_form.html", {"form": form, "object": obj})
+
+
+@login_required
+def assignment_delete(request: HttpRequest, pk: int) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    obj = get_object_or_404(VehicleAssignment, pk=pk)
+    if request.method == "POST":
+        obj.delete()
+    return assignments_view(request)
+
+
+# ------- Inspections -------
+@login_required
+def inspection_create(request: HttpRequest) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    if request.method == "POST":
+        form = InspectionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return inspections_view(request)
+    else:
+        form = InspectionForm()
+    return render(request, "portal/forms/inspection_form.html", {"form": form})
+
+
+@login_required
+def inspection_edit(request: HttpRequest, pk: int) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    obj = get_object_or_404(Inspection, pk=pk)
+    if request.method == "POST":
+        form = InspectionForm(request.POST, instance=obj)
+        if form.is_valid():
+            form.save()
+            return inspections_view(request)
+    else:
+        form = InspectionForm(instance=obj)
+    return render(request, "portal/forms/inspection_form.html", {"form": form, "object": obj})
+
+
+@login_required
+def inspection_delete(request: HttpRequest, pk: int) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    obj = get_object_or_404(Inspection, pk=pk)
+    if request.method == "POST":
+        obj.delete()
+    return inspections_view(request)
+
+
+# ------- Categories & Items -------
+@login_required
+def category_create(request: HttpRequest) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    if request.method == "POST":
+        form = InspectionCategoryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return categories_view(request)
+    else:
+        form = InspectionCategoryForm()
+    return render(request, "portal/forms/category_form.html", {"form": form})
+
+
+@login_required
+def category_edit(request: HttpRequest, pk: int) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    obj = get_object_or_404(InspectionCategory, pk=pk)
+    if request.method == "POST":
+        form = InspectionCategoryForm(request.POST, instance=obj)
+        if form.is_valid():
+            form.save()
+            return categories_view(request)
+    else:
+        form = InspectionCategoryForm(instance=obj)
+    return render(request, "portal/forms/category_form.html", {"form": form, "object": obj})
+
+
+@login_required
+def category_delete(request: HttpRequest, pk: int) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    obj = get_object_or_404(InspectionCategory, pk=pk)
+    if request.method == "POST":
+        obj.delete()
+    return categories_view(request)
+
+
+@login_required
+def checklist_item_create(request: HttpRequest) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    initial = {}
+    if request.method == "GET":
+        cat_id = request.GET.get("category")
+        if cat_id:
+            initial["category"] = cat_id
+    if request.method == "POST":
+        form = ChecklistItemForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return categories_view(request)
+    else:
+        form = ChecklistItemForm(initial=initial)
+    return render(request, "portal/forms/checklist_item_form.html", {"form": form})
+
+
+@login_required
+def checklist_item_edit(request: HttpRequest, pk: int) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    obj = get_object_or_404(ChecklistItem, pk=pk)
+    if request.method == "POST":
+        form = ChecklistItemForm(request.POST, instance=obj)
+        if form.is_valid():
+            form.save()
+            return categories_view(request)
+    else:
+        form = ChecklistItemForm(instance=obj)
+    return render(request, "portal/forms/checklist_item_form.html", {"form": form, "object": obj})
+
+
+@login_required
+def checklist_item_delete(request: HttpRequest, pk: int) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    # Direct import to avoid circular import at module top
+    from .models import ChecklistItem
+
+    obj = get_object_or_404(ChecklistItem, pk=pk)
+    if request.method == "POST":
+        obj.delete()
+    return categories_view(request)

@@ -86,3 +86,14 @@ body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:var(--bg);
   .sidebar{position:relative;width:100%;min-height:auto}
   .kpi-grid{grid-template-columns:repeat(1,minmax(0,1fr))}
 }
+
+/* Forms */
+.form{background:var(--panel);border:1px solid var(--panel-border);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+.form h3{margin:0 0 12px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.form .input,.form .select,.form .textarea{width:100%;padding:.5rem .6rem;border:1px solid var(--panel-border);border-radius:10px;background:#fff}
+.form label{display:block;font-weight:600;margin-bottom:6px}
+.form .field{display:flex;flex-direction:column}
+.form .field.checkbox{flex-direction:row;align-items:center;gap:.5rem}
+.form .actions{margin-top:12px;display:flex;gap:8px}
+@media (max-width: 720px){.form-grid{grid-template-columns:repeat(1,minmax(0,1fr))}}

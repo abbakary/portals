@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import '../data/inspections_repository.dart';
 import '../data/models.dart';
 import 'controllers/customer_dashboard_controller.dart';
-import 'inspection_detail_screen.dart';
+import '../../../core/ui/animated_background.dart';
 
 class CustomerHomeScreen extends StatelessWidget {
   const CustomerHomeScreen({required this.profile, super.key});
@@ -34,14 +34,18 @@ class _CustomerHomeView extends StatelessWidget {
           appBar: AppBar(
             title: Text('Customer • ${profile.organization.isNotEmpty ? profile.organization : profile.fullName}')
           ),
-          body: SafeArea(
-            child: controller.isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : RefreshIndicator(
-                    onRefresh: controller.refresh,
-                    child: ListView(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-                      children: [
+          body: Stack(
+            children: [
+              const TopWaves(),
+              const AnimatedParticlesBackground(),
+              SafeArea(
+                child: controller.isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : RefreshIndicator(
+                        onRefresh: controller.refresh,
+                        child: ListView(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                          children: [
                         if (controller.error != null)
                           Card(
                             color: Theme.of(context).colorScheme.errorContainer,
