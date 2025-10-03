@@ -2,8 +2,8 @@
   <div class="section-header">
     <h2><i class="fa-solid fa-clipboard-check"></i> Inspections</h2>
     <div class="section-actions">
-      <a class="btn btn-primary" href="/django-admin/portal/inspection/add/"><i class="fa-solid fa-plus"></i> Add</a>
-      <a class="btn" href="/django-admin/portal/inspection/"><i class="fa-solid fa-gear"></i> Manage</a>
+      <button class="btn btn-primary" hx-get="{% url 'portal-inspections-new' %}" hx-target="#content"><i class="fa-solid fa-plus"></i> Add</button>
+      <button class="btn" hx-get="{% url 'portal-inspections' %}" hx-target="#content"><i class="fa-solid fa-gear"></i> Refresh</button>
     </div>
   </div>
   <div class="table-responsive">
@@ -17,6 +17,7 @@
           <th>Inspector</th>
           <th>Status</th>
           <th>Created</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -29,6 +30,13 @@
           <td>{% if ins.inspector %}{{ ins.inspector.profile.user.get_full_name|default:ins.inspector.profile.user.username }}{% else %}—{% endif %}</td>
           <td><span class="status">{{ ins.status }}</span></td>
           <td>{{ ins.created_at|date:'M d, Y H:i' }}</td>
+          <td>
+            <button class="btn" hx-get="{% url 'portal-inspections-edit' ins.id %}" hx-target="#content"><i class="fa-solid fa-pen"></i> Edit</button>
+            <form method="post" hx-post="{% url 'portal-inspections-delete' ins.id %}" hx-target="#content" style="display:inline-block">
+              {% csrf_token %}
+              <button class="btn" type="submit" onclick="return confirm('Delete this inspection?')"><i class="fa-solid fa-trash"></i> Delete</button>
+            </form>
+          </td>
         </tr>
         {% empty %}
         <tr><td colspan="7" class="muted">No inspections.</td></tr>
