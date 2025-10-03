@@ -76,6 +76,10 @@ body.dark .menu a.active{background:#172554;color:#bfdbfe}
 .table th,.table td{padding:10px;border-bottom:1px solid var(--panel-border)}
 .table thead th{position:sticky;top:0;background:#f8fafc}
 .table.compact th,.table.compact td{padding:6px}
+.search-input{max-width:220px}
+.table tbody tr.hidden{display:none}
+.loading-overlay{position:absolute;inset:0;background:rgba(255,255,255,.6);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:10}
+body.dark .loading-overlay{background:rgba(2,6,23,.5)}
 
 /* Welcome */
 .welcome{margin-top:18px;background:var(--panel);border:1px solid var(--panel-border);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
