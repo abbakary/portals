@@ -49,10 +49,10 @@ class _LoginScreenState extends State<LoginScreen> {
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 420),
-                child: AnimatedContainer(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  child: AnimatedContainer(
                   duration: const Duration(milliseconds: 400),
                   curve: Curves.easeOutCubic,
                   padding: const EdgeInsets.all(28),
@@ -170,11 +170,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ],
                     ),
-                  ),
-                ),
               ),
             ),
           ),
+        ],
+      ),
         ),
       ),
     );
