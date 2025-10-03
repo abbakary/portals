@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../auth/presentation/session_controller.dart';
 import '../data/models.dart';
 import '../data/inspections_repository.dart';
+import '../../../core/ui/animated_background.dart';
 import 'controllers/inspector_dashboard_controller.dart';
 import 'inspection_form_screen.dart';
 import 'inspection_detail_screen.dart';
@@ -26,10 +27,15 @@ class InspectorHomeScreen extends StatelessWidget {
   }
 }
 
-class _InspectorHomeView extends StatelessWidget {
+class _InspectorHomeView extends StatefulWidget {
   const _InspectorHomeView({required this.profile});
-
   final PortalProfile profile;
+  @override
+  State<_InspectorHomeView> createState() => _InspectorHomeViewState();
+}
+
+class _InspectorHomeViewState extends State<_InspectorHomeView> {
+  bool _fabOpen = false;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +43,7 @@ class _InspectorHomeView extends StatelessWidget {
       builder: (context, controller, _) {
         return Scaffold(
           appBar: AppBar(
-            title: Text('Inspector • ${profile.fullName}'),
+            title: Text('Inspector • ${widget.profile.fullName}'),
             actions: [
               IconButton(
                 icon: const Icon(Icons.logout),
@@ -48,21 +54,37 @@ class _InspectorHomeView extends StatelessWidget {
               ),
             ],
           ),
-          floatingActionButton: controller.vehicles.isEmpty || controller.inspectorProfileId == null
-              ? null
-              : FloatingActionButton.extended(
-                  icon: const Icon(Icons.add_task),
-                  label: const Text('New inspection'),
-                  onPressed: () => _startAdHocInspection(context, controller),
-                ),
-          body: SafeArea(
-            child: controller.isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : RefreshIndicator(
-                    onRefresh: controller.refresh,
-                    child: ListView(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-                      children: [
+          floatingActionButton: _buildFab(context, controller),
+          body: Stack(
+            children: [
+              const TopWaves(),
+              const AnimatedParticlesBackground(),
+              SafeArea(
+                child: controller.isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : RefreshIndicator(
+                        onRefresh: controller.refresh,
+                        child: ListView(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                          children: [
+                            _QuickActionsBar(
+                              onNewInspection: controller.vehicles.isEmpty || controller.inspectorProfileId == null
+                                  ? null
+                                  : () => _startAdHocInspection(context, controller),
+                              onSync: controller.isSyncing
+                                  ? null
+                                  : () async {
+                                      final processed = await controller.syncOfflineInspections();
+                                      if (!context.mounted) return;
+                                      final message = processed > 0
+                                          ? 'Synced $processed inspection(s).'
+                                          : 'No inspections waiting for sync.';
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text(message)),
+                                      );
+                                    },
+                              onRefresh: controller.refresh,
+                            ),
                         if (controller.error != null)
                           Card(
                             color: Theme.of(context).colorScheme.errorContainer,
@@ -108,6 +130,9 @@ class _InspectorHomeView extends StatelessWidget {
                               assignment: assignment,
                               vehicle: vehicle,
                               onStart: () => _startAssignmentInspection(context, controller, assignment),
+                              onAddVehicle: vehicle?.customerId != null
+                                  ? () => _openAddVehicleDialog(context, controller, vehicle!.customerId!)
+                                  : null,
                             );
                           }),
                         const SizedBox(height: 32),
@@ -130,31 +155,58 @@ class _InspectorHomeView extends StatelessWidget {
                               onTap: () => _openInspectionDetail(context, inspection),
                             ),
                           ),
-                        const SizedBox(height: 24),
-                        FilledButton.icon(
-                          icon: const Icon(Icons.sync),
-                          label: const Text('Sync offline inspections'),
-                          onPressed: controller.isSyncing
-                              ? null
-                              : () async {
-                                  final processed = await controller.syncOfflineInspections();
-                                  if (!context.mounted) return;
-                                  final message = processed > 0
-                                      ? 'Synced $processed inspection(s).'
-                                      : 'No inspections waiting for sync.';
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(message)),
-                                  );
-                                },
-                        ),
+                        const SizedBox(height: 12),
                       ],
                     ),
                   ),
+              ),
+            ],
           ),
         );
       },
     );
   }
+
+class _QuickActionsBar extends StatelessWidget {
+  const _QuickActionsBar({this.onNewInspection, this.onSync, this.onRefresh});
+  final VoidCallback? onNewInspection;
+  final Future<void> Function()? onSync;
+  final Future<void> Function()? onRefresh;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        children: [
+          Expanded(
+            child: FilledButton.icon(
+              onPressed: onNewInspection,
+              icon: const Icon(Icons.add_task),
+              label: const Text('New inspection'),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: FilledButton.icon(
+              onPressed: onSync,
+              icon: const Icon(Icons.sync),
+              label: const Text('Sync offline'),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: onRefresh,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Refresh'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
   Future<void> _startAssignmentInspection(
     BuildContext context,
@@ -233,6 +285,122 @@ class _InspectorHomeView extends StatelessWidget {
     );
   }
 
+  Widget _buildFab(BuildContext context, InspectorDashboardController controller) {
+    if (controller.inspectorProfileId == null) return null as Widget;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (_fabOpen) ...[
+          _MiniFab(
+            icon: Icons.add_task,
+            label: 'New inspection',
+            onTap: controller.vehicles.isEmpty ? null : () => _startAdHocInspection(context, controller),
+          ),
+          const SizedBox(height: 10),
+          _MiniFab(
+            icon: Icons.sync,
+            label: controller.isSyncing ? 'Syncing…' : 'Sync offline',
+            onTap: controller.isSyncing
+                ? null
+                : () async {
+                    final processed = await controller.syncOfflineInspections();
+                    if (!context.mounted) return;
+                    final message = processed > 0
+                        ? 'Synced $processed inspection(s).'
+                        : 'No inspections waiting for sync.';
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+                  },
+          ),
+        ],
+        FloatingActionButton(
+          onPressed: () => setState(() => _fabOpen = !_fabOpen),
+          child: Icon(_fabOpen ? Icons.close : Icons.menu),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _openAddVehicleDialog(
+    BuildContext context,
+    InspectorDashboardController controller,
+    int customerId,
+  ) async {
+    final vin = TextEditingController();
+    final plate = TextEditingController();
+    final make = TextEditingController();
+    final model = TextEditingController();
+    final year = TextEditingController(text: DateTime.now().year.toString());
+    final type = TextEditingController();
+    final mileage = TextEditingController(text: '0');
+    final notes = TextEditingController();
+
+    final formKey = GlobalKey<FormState>();
+
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add vehicle'),
+        content: Form(
+          key: formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(controller: plate, decoration: const InputDecoration(labelText: 'License plate'), validator: _req),
+                TextFormField(controller: vin, decoration: const InputDecoration(labelText: 'VIN'), validator: _req),
+                Row(children: [
+                  Expanded(child: TextFormField(controller: make, decoration: const InputDecoration(labelText: 'Make'), validator: _req)),
+                  const SizedBox(width: 12),
+                  Expanded(child: TextFormField(controller: model, decoration: const InputDecoration(labelText: 'Model'), validator: _req)),
+                ]),
+                Row(children: [
+                  Expanded(child: TextFormField(controller: year, decoration: const InputDecoration(labelText: 'Year'), keyboardType: TextInputType.number, validator: _req)),
+                  const SizedBox(width: 12),
+                  Expanded(child: TextFormField(controller: type, decoration: const InputDecoration(labelText: 'Vehicle type'), validator: _req)),
+                ]),
+                Row(children: [
+                  Expanded(child: TextFormField(controller: mileage, decoration: const InputDecoration(labelText: 'Mileage'), keyboardType: TextInputType.number)),
+                  const SizedBox(width: 12),
+                  Expanded(child: TextFormField(controller: notes, decoration: const InputDecoration(labelText: 'Notes'))),
+                ]),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
+          FilledButton(
+            onPressed: () async {
+              if (!formKey.currentState!.validate()) return;
+              final id = await controller.createVehicle(
+                customerId: customerId,
+                vin: vin.text.trim(),
+                licensePlate: plate.text.trim(),
+                make: make.text.trim(),
+                model: model.text.trim(),
+                year: int.tryParse(year.text) ?? DateTime.now().year,
+                vehicleType: type.text.trim(),
+                mileage: int.tryParse(mileage.text) ?? 0,
+                notes: notes.text.trim().isEmpty ? null : notes.text.trim(),
+              );
+              if (!context.mounted) return;
+              if (id != null) {
+                Navigator.of(context).pop(true);
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vehicle added.')));
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+    if (saved == true) {
+      await controller.refresh();
+    }
+  }
+
+  String? _req(String? v) => (v == null || v.trim().isEmpty) ? 'Required' : null;
+
   Future<void> _openInspectionDetail(BuildContext context, InspectionSummaryModel summary) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
@@ -247,11 +415,13 @@ class _AssignmentCard extends StatelessWidget {
     required this.assignment,
     required this.vehicle,
     required this.onStart,
+    this.onAddVehicle,
   });
 
   final VehicleAssignmentModel assignment;
   final VehicleModel? vehicle;
   final VoidCallback onStart;
+  final VoidCallback? onAddVehicle;
 
   @override
   Widget build(BuildContext context) {
@@ -277,13 +447,22 @@ class _AssignmentCard extends StatelessWidget {
               Text(assignment.remarks),
             ],
             const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerRight,
-              child: FilledButton.icon(
-                onPressed: onStart,
-                icon: const Icon(Icons.assignment_turned_in),
-                label: const Text('Start inspection'),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                if (onAddVehicle != null)
+                  OutlinedButton.icon(
+                    onPressed: onAddVehicle,
+                    icon: const Icon(Icons.add),
+                    label: const Text('Add vehicle'),
+                  ),
+                const SizedBox(width: 8),
+                FilledButton.icon(
+                  onPressed: onStart,
+                  icon: const Icon(Icons.assignment_turned_in),
+                  label: const Text('Start inspection'),
+                ),
+              ],
             ),
           ],
         ),

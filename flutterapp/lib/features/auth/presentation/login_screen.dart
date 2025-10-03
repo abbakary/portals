@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/exceptions/app_exception.dart';
+import '../../../core/ui/animated_background.dart';
 import 'session_controller.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -31,21 +32,23 @@ class _LoginScreenState extends State<LoginScreen> {
     final error = session.error;
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF0B486B),
-              Color(0xFF3B8D99),
-              Color(0xFF82DBD8),
-            ],
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF0B486B), Color(0xFF3B8D99), Color(0xFF82DBD8)],
+              ),
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
+          const TopWaves(),
+          const AnimatedParticlesBackground(),
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 420),
