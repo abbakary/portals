@@ -67,7 +67,7 @@
         {% for error in form.is_active.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
       </div>
     </div>
-    {% if form.password1 %}
+    {% if is_create %}
     <div class="form-divider"></div>
     <h3 class="form-subtitle"><i class="fa-solid fa-lock"></i> Credentials</h3>
     <div class="form-grid form-grid-2">
