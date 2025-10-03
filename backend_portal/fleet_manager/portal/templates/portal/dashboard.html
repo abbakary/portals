@@ -14,6 +14,18 @@
       <button class="btn" hx-get="{% url 'portal-customers' %}" hx-target="#content"><i class="fa-solid fa-eye"></i> View</button>
     </div>
   </div>
+  <div class="kpi-card gradient-teal">
+    <div class="kpi-icon"><i class="fa-solid fa-circle-user"></i></div>
+    <div class="kpi-info">
+      <div class="kpi-label">Portal users</div>
+      <div class="kpi-value">{{ kpi_users }}</div>
+    </div>
+    <div class="kpi-actions">
+      <button class="btn btn-primary" hx-get="{% url 'portal-users-new' %}" hx-target="#content"><i class="fa-solid fa-user-plus"></i> Add</button>
+      <button class="btn" hx-get="{% url 'portal-users' %}" hx-target="#content"><i class="fa-solid fa-gear"></i> Manage</button>
+      <button class="btn" hx-get="{% url 'portal-users' %}" hx-target="#content"><i class="fa-solid fa-eye"></i> View</button>
+    </div>
+  </div>
   <div class="kpi-card gradient-green">
     <div class="kpi-icon"><i class="fa-solid fa-car"></i></div>
     <div class="kpi-info">
@@ -57,6 +69,7 @@
   <p>Use the sidebar or the buttons above to manage your fleet data. Content loads instantly without leaving this page.</p>
   <div class="quick-links">
     <button class="btn btn-ghost" hx-get="{% url 'portal-assignments' %}" hx-target="#content"><i class="fa-solid fa-calendar-check"></i> View Assignments</button>
+    <button class="btn btn-ghost" hx-get="{% url 'portal-users' %}" hx-target="#content"><i class="fa-solid fa-circle-user"></i> Manage Users</button>
     <button class="btn btn-ghost" hx-get="{% url 'portal-categories' %}" hx-target="#content"><i class="fa-solid fa-list-check"></i> Checklist</button>
   </div>
 </div>

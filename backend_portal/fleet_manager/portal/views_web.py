@@ -2,16 +2,27 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpRequest, HttpResponse
 
-from .models import Customer, Vehicle, InspectorProfile, VehicleAssignment, Inspection, InspectionCategory, ChecklistItem
-from .permissions import get_portal_profile, PortalUser
+from .models import (
+    ChecklistItem,
+    Customer,
+    Inspection,
+    InspectionCategory,
+    InspectorProfile,
+    PortalUser,
+    Vehicle,
+    VehicleAssignment,
+)
+from .permissions import get_portal_profile
 from .forms import (
-    CustomerForm,
-    VehicleForm,
-    InspectorProfileForm,
-    VehicleAssignmentForm,
-    InspectionForm,
-    InspectionCategoryForm,
     ChecklistItemForm,
+    CustomerForm,
+    InspectionCategoryForm,
+    InspectionForm,
+    InspectorProfileForm,
+    PortalUserCreateForm,
+    PortalUserUpdateForm,
+    VehicleAssignmentForm,
+    VehicleForm,
 )
 
 
@@ -33,6 +44,7 @@ def app_shell(request: HttpRequest) -> HttpResponse:
     context = {
         "profile": profile,
         "kpi_customers": Customer.objects.count(),
+        "kpi_users": PortalUser.objects.exclude(role=PortalUser.ROLE_ADMIN).count(),
         "kpi_vehicles": Vehicle.objects.count(),
         "kpi_inspectors": InspectorProfile.objects.count(),
         "kpi_inspections": Inspection.objects.count(),
@@ -102,6 +114,64 @@ def categories_view(request: HttpRequest) -> HttpResponse:
         return render(request, "portal/forbidden.html", status=403)
     categories = InspectionCategory.objects.prefetch_related("items").order_by("display_order")
     return render(request, "portal/partials/categories.html", {"categories": categories})
+
+
+# ------- Portal users -------
+@login_required
+def users_view(request: HttpRequest) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    users = PortalUser.objects.select_related("user").order_by("-created_at")[:200]
+    return render(request, "portal/partials/users.html", {"users": users})
+
+
+@login_required
+def user_create(request: HttpRequest) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    if request.method == "POST":
+        form = PortalUserCreateForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return users_view(request)
+    else:
+        form = PortalUserCreateForm()
+    return render(request, "portal/forms/portal_user_form.html", {"form": form, "is_create": True})
+
+
+@login_required
+def user_edit(request: HttpRequest, pk: int) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    portal_user = get_object_or_404(PortalUser.objects.select_related("user"), pk=pk)
+    if request.method == "POST":
+        form = PortalUserUpdateForm(request.POST, instance=portal_user)
+        if form.is_valid():
+            form.save()
+            return users_view(request)
+    else:
+        form = PortalUserUpdateForm(instance=portal_user)
+    return render(
+        request,
+        "portal/forms/portal_user_form.html",
+        {"form": form, "object": portal_user, "is_create": False},
+    )
+
+
+@login_required
+def user_delete(request: HttpRequest, pk: int) -> HttpResponse:
+    profile = _require_admin(request)
+    if not profile:
+        return render(request, "portal/forbidden.html", status=403)
+    portal_user = get_object_or_404(PortalUser.objects.select_related("user"), pk=pk)
+    if request.method == "POST":
+        user = portal_user.user
+        portal_user.delete()
+        user.delete()
+    return users_view(request)
 
 
 # ------- Customers -------

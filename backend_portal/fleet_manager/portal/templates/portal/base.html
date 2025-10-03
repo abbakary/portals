@@ -24,6 +24,9 @@
         <a href="{% url 'portal-app' %}" hx-get="{% url 'portal-customers' %}" hx-target="#content" hx-push-url="true" data-route="/app/customers/">
           <i class="fa-solid fa-building-user"></i><span>Customers</span>
         </a>
+        <a href="{% url 'portal-app' %}" hx-get="{% url 'portal-users' %}" hx-target="#content" hx-push-url="true" data-route="/app/users/">
+          <i class="fa-solid fa-circle-user"></i><span>Users</span>
+        </a>
         <a href="{% url 'portal-app' %}" hx-get="{% url 'portal-vehicles' %}" hx-target="#content" hx-push-url="true" data-route="/app/vehicles/">
           <i class="fa-solid fa-car"></i><span>Vehicles</span>
         </a>
@@ -62,6 +65,7 @@
         </div>
         <div class="topbar-actions">
           <button class="btn" hx-get="{% url 'portal-customers' %}" hx-target="#content"><i class="fa-solid fa-building-user"></i> Customers</button>
+          <button class="btn" hx-get="{% url 'portal-users' %}" hx-target="#content"><i class="fa-solid fa-circle-user"></i> Users</button>
           <button class="btn" hx-get="{% url 'portal-vehicles' %}" hx-target="#content"><i class="fa-solid fa-car"></i> Vehicles</button>
           <button class="btn" hx-get="{% url 'portal-inspectors' %}" hx-target="#content"><i class="fa-solid fa-user-shield"></i> Inspectors</button>
           <button class="btn" hx-get="{% url 'portal-assignments' %}" hx-target="#content"><i class="fa-solid fa-calendar-check"></i> Assignments</button>
