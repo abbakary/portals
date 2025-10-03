@@ -14,7 +14,7 @@
       <button class="btn" hx-get="{% url 'portal-categories-edit' cat.id %}" hx-target="#content"><i class="fa-solid fa-pen"></i> Edit Category</button>
       <form method="post" hx-post="{% url 'portal-categories-delete' cat.id %}" hx-target="#content" style="display:inline-block">
         {% csrf_token %}
-        <button class="btn" type="submit" onclick="return confirm('Delete this category?')"><i class="fa-solid fa-trash"></i> Delete</button>
+        <button class="btn" type="submit" data-confirm="Delete this category?"><i class="fa-solid fa-trash"></i> Delete</button>
       </form>
       <button class="btn btn-primary" hx-get="{% url 'portal-checklist-items-new' %}?category={{ cat.id }}" hx-target="#content"><i class="fa-solid fa-plus"></i> Add Item</button>
     </div>
@@ -44,7 +44,7 @@
                 <button class="btn" hx-get="{% url 'portal-checklist-items-edit' item.id %}" hx-target="#content"><i class="fa-solid fa-pen"></i> Edit</button>
                 <form method="post" hx-post="{% url 'portal-checklist-items-delete' item.id %}" hx-target="#content" style="display:inline-block">
                   {% csrf_token %}
-                  <button class="btn" type="submit" onclick="return confirm('Delete this item?')"><i class="fa-solid fa-trash"></i> Delete</button>
+                  <button class="btn" type="submit" data-confirm="Delete this item?"><i class="fa-solid fa-trash"></i> Delete</button>
                 </form>
               </td>
             </tr>
