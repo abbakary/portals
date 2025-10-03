@@ -138,7 +138,7 @@ def user_create(request: HttpRequest) -> HttpResponse:
             return users_view(request)
     else:
         form = PortalUserCreateForm()
-    return render(request, "portal/forms/portal_user_form.html", {"form": form})
+    return render(request, "portal/forms/portal_user_form.html", {"form": form, "is_create": True})
 
 
 @login_required
@@ -154,7 +154,11 @@ def user_edit(request: HttpRequest, pk: int) -> HttpResponse:
             return users_view(request)
     else:
         form = PortalUserUpdateForm(instance=portal_user)
-    return render(request, "portal/forms/portal_user_form.html", {"form": form, "object": portal_user})
+    return render(
+        request,
+        "portal/forms/portal_user_form.html",
+        {"form": form, "object": portal_user, "is_create": False},
+    )
 
 
 @login_required
