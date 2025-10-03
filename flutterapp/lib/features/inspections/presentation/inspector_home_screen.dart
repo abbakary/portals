@@ -286,7 +286,7 @@ class _QuickActionsBar extends StatelessWidget {
   }
 
   Widget _buildFab(BuildContext context, InspectorDashboardController controller) {
-    if (controller.inspectorProfileId == null) return null as Widget;
+    if (controller.inspectorProfileId == null) return const SizedBox.shrink();
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
