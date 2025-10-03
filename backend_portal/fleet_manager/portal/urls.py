@@ -31,6 +31,11 @@ urlpatterns = [
     path('app/customers/<int:pk>/edit/', views_web.customer_edit, name='portal-customers-edit'),
     path('app/customers/<int:pk>/delete/', views_web.customer_delete, name='portal-customers-delete'),
 
+    path('app/users/', views_web.users_view, name='portal-users'),
+    path('app/users/new/', views_web.user_create, name='portal-users-new'),
+    path('app/users/<int:pk>/edit/', views_web.user_edit, name='portal-users-edit'),
+    path('app/users/<int:pk>/delete/', views_web.user_delete, name='portal-users-delete'),
+
     path('app/vehicles/', views_web.vehicles_view, name='portal-vehicles'),
     path('app/vehicles/new/', views_web.vehicle_create, name='portal-vehicles-new'),
     path('app/vehicles/<int:pk>/edit/', views_web.vehicle_edit, name='portal-vehicles-edit'),
