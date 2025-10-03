@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../data/inspections_repository.dart';
 import '../data/models.dart';
-import '../../core/ui/animated_background.dart';
+import '../../../core/ui/animated_background.dart';
 
 class CustomerHomeScreen extends StatelessWidget {
   const CustomerHomeScreen({required this.profile, super.key});
