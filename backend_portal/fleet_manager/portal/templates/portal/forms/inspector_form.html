@@ -1,0 +1,17 @@
+<div class="section-header">
+  <h2><i class="fa-solid fa-user-shield"></i> {% if object %}Edit{% else %}New{% endif %} Inspector</h2>
+</div>
+<form class="form" hx-post="{{ request.path }}" hx-target="#content">
+  {% csrf_token %}
+  <div class="form-grid">
+    <div class="field"><label for="id_profile">Portal Profile</label>{{ form.profile }}</div>
+    <div class="field"><label for="id_badge_id">Badge ID</label>{{ form.badge_id }}</div>
+    <div class="field"><label for="id_max_daily_inspections">Max per day</label>{{ form.max_daily_inspections }}</div>
+    <div class="field checkbox"><label for="id_is_active">Active</label>{{ form.is_active }}</div>
+    <div class="field" style="grid-column:1/-1"><label for="id_certifications">Certifications</label>{{ form.certifications }}</div>
+  </div>
+  <div class="actions">
+    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+    <button type="button" class="btn" hx-get="{% url 'portal-inspectors' %}" hx-target="#content">Cancel</button>
+  </div>
+</form>
