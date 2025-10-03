@@ -1,0 +1,21 @@
+<div class="section-header">
+  <h2><i class="fa-solid fa-clipboard-check"></i> {% if object %}Edit{% else %}New{% endif %} Inspection</h2>
+</div>
+<form class="form" hx-post="{{ request.path }}" hx-target="#content">
+  {% csrf_token %}
+  <div class="form-grid">
+    <div class="field"><label for="id_assignment">Assignment</label>{{ form.assignment }}</div>
+    <div class="field"><label for="id_vehicle">Vehicle</label>{{ form.vehicle }}</div>
+    <div class="field"><label for="id_customer">Customer</label>{{ form.customer }}</div>
+    <div class="field"><label for="id_inspector">Inspector</label>{{ form.inspector }}</div>
+    <div class="field"><label for="id_status">Status</label>{{ form.status }}</div>
+    <div class="field"><label for="id_odometer_reading">Odometer</label>{{ form.odometer_reading }}</div>
+    <div class="field"><label for="id_started_at">Started</label>{{ form.started_at }}</div>
+    <div class="field"><label for="id_completed_at">Completed</label>{{ form.completed_at }}</div>
+    <div class="field" style="grid-column:1/-1"><label for="id_general_notes">Notes</label>{{ form.general_notes }}</div>
+  </div>
+  <div class="actions">
+    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+    <button type="button" class="btn" hx-get="{% url 'portal-inspections' %}" hx-target="#content">Cancel</button>
+  </div>
+</form>
