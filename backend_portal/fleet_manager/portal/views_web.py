@@ -391,7 +391,7 @@ def checklist_item_edit(request: HttpRequest, pk: int) -> HttpResponse:
     profile = _require_admin(request)
     if not profile:
         return render(request, "portal/forbidden.html", status=403)
-    obj = get_object_or_404(InspectionCategory.items.rel.related_model, pk=pk)  # ChecklistItem
+    obj = get_object_or_404(ChecklistItem, pk=pk)
     if request.method == "POST":
         form = ChecklistItemForm(request.POST, instance=obj)
         if form.is_valid():
