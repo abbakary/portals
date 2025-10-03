@@ -1,0 +1,89 @@
+<div class="section surface surface-glow">
+  <div class="section-header stacked">
+    <div>
+      <h2><i class="fa-solid fa-circle-user"></i> Portal users</h2>
+      <p class="muted">Manage sign-in profiles for customers, inspectors, and fellow administrators.</p>
+    </div>
+    <div class="section-actions">
+      <input
+        class="input search-input"
+        type="search"
+        placeholder="Search profiles"
+        aria-label="Search portal users"
+        data-filter-container=".user-grid"
+        data-filter-target=".user-card"
+      >
+      <button class="btn btn-primary" hx-get="{% url 'portal-users-new' %}" hx-target="#content">
+        <i class="fa-solid fa-user-plus"></i> New profile
+      </button>
+      <button class="btn" hx-get="{% url 'portal-users' %}" hx-target="#content">
+        <i class="fa-solid fa-rotate"></i> Refresh
+      </button>
+    </div>
+  </div>
+  <div class="user-grid">
+    {% for u in users %}
+    <article class="user-card" data-filter-value="{{ u.user.get_full_name|default:u.user.username }} {{ u.user.email }} {{ u.role }}">
+      <header class="user-card-header">
+        <div class="user-avatar" aria-hidden="true">
+          {{ u.user.get_full_name|default:u.user.username|slice:":1"|upper }}
+        </div>
+        <div class="user-summary">
+          <h3>{{ u.user.get_full_name|default:u.user.username }}</h3>
+          <p class="muted">@{{ u.user.username }}</p>
+        </div>
+        <span class="badge role-{{ u.role }}">{{ u.get_role_display }}</span>
+      </header>
+      <dl class="user-meta">
+        <div>
+          <dt>Email</dt>
+          <dd>{{ u.user.email|default:"—" }}</dd>
+        </div>
+        <div>
+          <dt>Phone</dt>
+          <dd>{{ u.phone_number|default:"—" }}</dd>
+        </div>
+        <div>
+          <dt>Organization</dt>
+          <dd>{{ u.organization|default:"—" }}</dd>
+        </div>
+        <div>
+          <dt>Job title</dt>
+          <dd>{{ u.job_title|default:"—" }}</dd>
+        </div>
+        <div>
+          <dt>Status</dt>
+          <dd>
+            <span class="badge {{ u.user.is_active|yesno:'status-active,status-inactive' }}">
+              {{ u.user.is_active|yesno:'Active,Inactive' }}
+            </span>
+          </dd>
+        </div>
+        <div>
+          <dt>Created</dt>
+          <dd>{{ u.created_at|date:'M d, Y' }}</dd>
+        </div>
+      </dl>
+      <div class="user-card-actions">
+        <button class="btn" hx-get="{% url 'portal-users-edit' u.id %}" hx-target="#content">
+          <i class="fa-solid fa-pen"></i> Edit
+        </button>
+        <form method="post" hx-post="{% url 'portal-users-delete' u.id %}" hx-target="#content">
+          {% csrf_token %}
+          <button class="btn" type="submit" data-confirm="Delete this profile?">
+            <i class="fa-solid fa-trash-can"></i> Delete
+          </button>
+        </form>
+      </div>
+    </article>
+    {% empty %}
+    <div class="empty-state">
+      <i class="fa-solid fa-user-plus"></i>
+      <p>No portal users yet. Create one to grant access.</p>
+      <button class="btn btn-primary" hx-get="{% url 'portal-users-new' %}" hx-target="#content">
+        <i class="fa-solid fa-user-plus"></i> Create the first profile
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+</div>
