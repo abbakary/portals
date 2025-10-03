@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/ui/animated_background.dart';
 import '../data/inspections_repository.dart';
 import '../data/models.dart';
 import 'controllers/customer_dashboard_controller.dart';
-import '../../../core/ui/animated_background.dart';
+import 'inspection_detail_screen.dart';
 
 class CustomerHomeScreen extends StatelessWidget {
   const CustomerHomeScreen({required this.profile, super.key});
@@ -15,7 +17,9 @@ class CustomerHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => CustomerDashboardController(repository: context.read<InspectionsRepository>())..loadDashboard(),
+      create: (_) => CustomerDashboardController(
+        repository: context.read<InspectionsRepository>(),
+      )..loadDashboard(),
       child: _CustomerHomeView(profile: profile),
     );
   }
@@ -32,7 +36,9 @@ class _CustomerHomeView extends StatelessWidget {
       builder: (context, controller, _) {
         return Scaffold(
           appBar: AppBar(
-            title: Text('Customer • ${profile.organization.isNotEmpty ? profile.organization : profile.fullName}')
+            title: Text(
+              'Customer • ${profile.organization.isNotEmpty ? profile.organization : profile.fullName}',
+            ),
           ),
           body: Stack(
             children: [
@@ -46,46 +52,80 @@ class _CustomerHomeView extends StatelessWidget {
                         child: ListView(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                           children: [
-                        if (controller.error != null)
-                          Card(
-                            color: Theme.of(context).colorScheme.errorContainer,
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Text(controller.error ?? '', style: TextStyle(color: Theme.of(context).colorScheme.onErrorContainer)),
-                            ),
-                          ),
-                        Text('Your vehicles', style: Theme.of(context).textTheme.titleLarge),
-                        const SizedBox(height: 12),
-                        if (controller.vehicles.isEmpty)
-                          const Card(child: Padding(padding: EdgeInsets.all(16), child: Text('No vehicles registered.')))
-                        else
-                          ...controller.vehicles.map((v) => Card(
-                                child: ListTile(
-                                  title: Text(v.licensePlate.isNotEmpty ? '${v.licensePlate} • ${v.make} ${v.model}' : v.vin),
-                                  subtitle: Text('Type: ${v.vehicleType} • Mileage: ${v.mileage} mi'),
-                                ),
-                              )),
-                        const SizedBox(height: 24),
-                        Text('Inspection history', style: Theme.of(context).textTheme.titleLarge),
-                        const SizedBox(height: 12),
-                        if (controller.inspections.isEmpty)
-                          const Card(child: Padding(padding: EdgeInsets.all(16), child: Text('No inspections yet.')))
-                        else
-                          ...controller.inspections.map((inspection) => Card(
-                                child: ListTile(
-                                  title: Text(inspection.vehicle.licensePlate.isNotEmpty
-                                      ? '${inspection.vehicle.licensePlate} • ${inspection.vehicle.make} ${inspection.vehicle.model}'
-                                      : inspection.vehicle.vin),
-                                  subtitle: Text('${inspection.statusDisplay} • ${DateFormat.yMMMd().format(inspection.createdAt)}'),
-                                  trailing: const Icon(Icons.chevron_right),
-                                  onTap: () => Navigator.of(context).push(
-                                    MaterialPageRoute(builder: (_) => InspectionDetailScreen(summary: inspection)),
+                            if (controller.error != null)
+                              Card(
+                                color: Theme.of(context).colorScheme.errorContainer,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Text(
+                                    controller.error ?? '',
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onErrorContainer,
+                                    ),
                                   ),
                                 ),
-                              )),
-                      ],
+                              ),
+                            Text('Your vehicles', style: Theme.of(context).textTheme.titleLarge),
+                            const SizedBox(height: 12),
+                            if (controller.vehicles.isEmpty)
+                              const Card(
+                                child: Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: Text('No vehicles registered.'),
+                                ),
+                              )
+                            else
+                              ...controller.vehicles.map(
+                                (v) => Card(
+                                  child: ListTile(
+                                    title: Text(
+                                      v.licensePlate.isNotEmpty
+                                          ? '${v.licensePlate} • ${v.make} ${v.model}'
+                                          : v.vin,
+                                    ),
+                                    subtitle: Text(
+                                      'Type: ${v.vehicleType} • Mileage: ${v.mileage} mi',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            const SizedBox(height: 24),
+                            Text('Inspection history', style: Theme.of(context).textTheme.titleLarge),
+                            const SizedBox(height: 12),
+                            if (controller.inspections.isEmpty)
+                              const Card(
+                                child: Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: Text('No inspections yet.'),
+                                ),
+                              )
+                            else
+                              ...controller.inspections.map(
+                                (inspection) => Card(
+                                  child: ListTile(
+                                    title: Text(
+                                      inspection.vehicle.licensePlate.isNotEmpty
+                                          ? '${inspection.vehicle.licensePlate} • ${inspection.vehicle.make} ${inspection.vehicle.model}'
+                                          : inspection.vehicle.vin,
+                                    ),
+                                    subtitle: Text(
+                                      '${inspection.statusDisplay} • ${DateFormat.yMMMd().format(inspection.createdAt)}',
+                                    ),
+                                    trailing: const Icon(Icons.chevron_right),
+                                    onTap: () => Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) => InspectionDetailScreen(summary: inspection),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
+              ),
+            ],
           ),
         );
       },

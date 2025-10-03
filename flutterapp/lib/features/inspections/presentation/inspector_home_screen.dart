@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../../auth/presentation/session_controller.dart';
-import '../data/models.dart';
-import '../data/inspections_repository.dart';
 import '../../../core/ui/animated_background.dart';
+import '../../auth/presentation/session_controller.dart';
+import '../data/inspections_repository.dart';
+import '../data/models.dart';
 import 'controllers/inspector_dashboard_controller.dart';
-import 'inspection_form_screen.dart';
 import 'inspection_detail_screen.dart';
+import 'inspection_form_screen.dart';
 
 class InspectorHomeScreen extends StatelessWidget {
   const InspectorHomeScreen({required this.profile, super.key});
@@ -29,7 +29,9 @@ class InspectorHomeScreen extends StatelessWidget {
 
 class _InspectorHomeView extends StatefulWidget {
   const _InspectorHomeView({required this.profile});
+
   final PortalProfile profile;
+
   @override
   State<_InspectorHomeView> createState() => _InspectorHomeViewState();
 }
@@ -85,80 +87,82 @@ class _InspectorHomeViewState extends State<_InspectorHomeView> {
                                     },
                               onRefresh: controller.refresh,
                             ),
-                        if (controller.error != null)
-                          Card(
-                            color: Theme.of(context).colorScheme.errorContainer,
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Text(
-                                controller.error ?? '',
-                                style: TextStyle(color: Theme.of(context).colorScheme.onErrorContainer),
-                              ),
-                            ),
-                          ),
-                        if (controller.isSyncing)
-                          const Padding(
-                            padding: EdgeInsets.only(bottom: 16),
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                            if (controller.error != null)
+                              Card(
+                                color: Theme.of(context).colorScheme.errorContainer,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Text(
+                                    controller.error ?? '',
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onErrorContainer,
+                                    ),
+                                  ),
                                 ),
-                                SizedBox(width: 8),
-                                Text('Syncing offline inspections…'),
-                              ],
+                              ),
+                            if (controller.isSyncing)
+                              const Padding(
+                                padding: EdgeInsets.only(bottom: 16),
+                                child: Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text('Syncing offline inspections…'),
+                                  ],
+                                ),
+                              ),
+                            Text(
+                              'Today\'s assignments',
+                              style: Theme.of(context).textTheme.titleLarge,
                             ),
-                          ),
-                        Text(
-                          'Today\'s assignments',
-                          style: Theme.of(context).textTheme.titleLarge,
+                            const SizedBox(height: 12),
+                            if (controller.assignments.isEmpty)
+                              const Card(
+                                child: Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: Text('No assignments scheduled.'),
+                                ),
+                              )
+                            else
+                              ...controller.assignments.map((assignment) {
+                                final vehicle = controller.vehicleById(assignment.vehicleId);
+                                return _AssignmentCard(
+                                  assignment: assignment,
+                                  vehicle: vehicle,
+                                  onStart: () => _startAssignmentInspection(context, controller, assignment),
+                                  onAddVehicle: vehicle?.customerId != null
+                                      ? () => _openAddVehicleDialog(context, controller, vehicle!.customerId!)
+                                      : null,
+                                );
+                              }),
+                            const SizedBox(height: 32),
+                            Text(
+                              'Recent inspections',
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                            const SizedBox(height: 12),
+                            if (controller.recentInspections.isEmpty)
+                              const Card(
+                                child: Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: Text('No inspections submitted yet.'),
+                                ),
+                              )
+                            else
+                              ...controller.recentInspections.map(
+                                (inspection) => _InspectionListTile(
+                                  inspection: inspection,
+                                  onTap: () => _openInspectionDetail(context, inspection),
+                                ),
+                              ),
+                            const SizedBox(height: 12),
+                          ],
                         ),
-                        const SizedBox(height: 12),
-                        if (controller.assignments.isEmpty)
-                          const Card(
-                            child: Padding(
-                              padding: EdgeInsets.all(16),
-                              child: Text('No assignments scheduled.'),
-                            ),
-                          )
-                        else
-                          ...controller.assignments.map((assignment) {
-                            final vehicle = controller.vehicleById(assignment.vehicleId);
-                            return _AssignmentCard(
-                              assignment: assignment,
-                              vehicle: vehicle,
-                              onStart: () => _startAssignmentInspection(context, controller, assignment),
-                              onAddVehicle: vehicle?.customerId != null
-                                  ? () => _openAddVehicleDialog(context, controller, vehicle!.customerId!)
-                                  : null,
-                            );
-                          }),
-                        const SizedBox(height: 32),
-                        Text(
-                          'Recent inspections',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 12),
-                        if (controller.recentInspections.isEmpty)
-                          const Card(
-                            child: Padding(
-                              padding: EdgeInsets.all(16),
-                              child: Text('No inspections submitted yet.'),
-                            ),
-                          )
-                        else
-                          ...controller.recentInspections.map(
-                            (inspection) => _InspectionListTile(
-                              inspection: inspection,
-                              onTap: () => _openInspectionDetail(context, inspection),
-                            ),
-                          ),
-                        const SizedBox(height: 12),
-                      ],
-                    ),
-                  ),
+                      ),
               ),
             ],
           ),
@@ -167,8 +171,289 @@ class _InspectorHomeViewState extends State<_InspectorHomeView> {
     );
   }
 
+  Widget _buildFab(BuildContext context, InspectorDashboardController controller) {
+    if (controller.inspectorProfileId == null) {
+      return const SizedBox.shrink();
+    }
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        if (_fabOpen) ...[
+          _MiniFab(
+            icon: Icons.add_task,
+            label: 'New inspection',
+            onTap: controller.vehicles.isEmpty ? null : () => _startAdHocInspection(context, controller),
+          ),
+          const SizedBox(height: 10),
+          _MiniFab(
+            icon: Icons.sync,
+            label: controller.isSyncing ? 'Syncing…' : 'Sync offline',
+            onTap: controller.isSyncing
+                ? null
+                : () async {
+                    final processed = await controller.syncOfflineInspections();
+                    if (!context.mounted) return;
+                    final message = processed > 0
+                        ? 'Synced $processed inspection(s).'
+                        : 'No inspections waiting for sync.';
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(message)),
+                    );
+                  },
+          ),
+          const SizedBox(height: 10),
+        ],
+        FloatingActionButton(
+          onPressed: () => setState(() => _fabOpen = !_fabOpen),
+          child: Icon(_fabOpen ? Icons.close : Icons.menu),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _startAssignmentInspection(
+    BuildContext context,
+    InspectorDashboardController controller,
+    VehicleAssignmentModel assignment,
+  ) async {
+    await _openInspectionForm(
+      context,
+      controller,
+      assignment: assignment,
+      initialVehicle: controller.vehicleById(assignment.vehicleId),
+    );
+  }
+
+  Future<void> _startAdHocInspection(
+    BuildContext context,
+    InspectorDashboardController controller,
+  ) async {
+    await _openInspectionForm(context, controller);
+  }
+
+  Future<void> _openInspectionForm(
+    BuildContext context,
+    InspectorDashboardController controller, {
+    VehicleAssignmentModel? assignment,
+    VehicleModel? initialVehicle,
+  }) async {
+    final inspectorId = controller.inspectorProfileId;
+    if (inspectorId == null) {
+      await showDialog<void>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Inspector profile missing'),
+          content: const Text(
+            'Unable to determine your inspector profile. Please sync assignments or contact an administrator.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    if (controller.categories.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Checklist categories not available. Try refreshing.')),
+      );
+      return;
+    }
+
+    final draft = await Navigator.of(context).push<InspectionDraftModel>(
+      MaterialPageRoute(
+        builder: (_) => InspectionFormScreen(
+          inspectorId: inspectorId,
+          categories: controller.categories,
+          vehicles: controller.vehicles,
+          assignment: assignment,
+          initialVehicle: initialVehicle,
+        ),
+      ),
+    );
+
+    if (draft == null) {
+      return;
+    }
+
+    final result = await controller.submitInspection(draft);
+    if (!context.mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          result.isSubmitted
+              ? 'Inspection submitted successfully.'
+              : 'Inspection saved offline and will sync when online.',
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openAddVehicleDialog(
+    BuildContext context,
+    InspectorDashboardController controller,
+    int customerId,
+  ) async {
+    final vin = TextEditingController();
+    final plate = TextEditingController();
+    final make = TextEditingController();
+    final model = TextEditingController();
+    final year = TextEditingController(text: DateTime.now().year.toString());
+    final type = TextEditingController();
+    final mileage = TextEditingController(text: '0');
+    final notes = TextEditingController();
+
+    final formKey = GlobalKey<FormState>();
+
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add vehicle'),
+        content: Form(
+          key: formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: plate,
+                  decoration: const InputDecoration(labelText: 'License plate'),
+                  validator: _req,
+                ),
+                TextFormField(
+                  controller: vin,
+                  decoration: const InputDecoration(labelText: 'VIN'),
+                  validator: _req,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: make,
+                        decoration: const InputDecoration(labelText: 'Make'),
+                        validator: _req,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextFormField(
+                        controller: model,
+                        decoration: const InputDecoration(labelText: 'Model'),
+                        validator: _req,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: year,
+                        decoration: const InputDecoration(labelText: 'Year'),
+                        keyboardType: TextInputType.number,
+                        validator: _req,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextFormField(
+                        controller: type,
+                        decoration: const InputDecoration(labelText: 'Vehicle type'),
+                        validator: _req,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: mileage,
+                        decoration: const InputDecoration(labelText: 'Mileage'),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextFormField(
+                        controller: notes,
+                        decoration: const InputDecoration(labelText: 'Notes'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              if (!formKey.currentState!.validate()) {
+                return;
+              }
+              final id = await controller.createVehicle(
+                customerId: customerId,
+                vin: vin.text.trim(),
+                licensePlate: plate.text.trim(),
+                make: make.text.trim(),
+                model: model.text.trim(),
+                year: int.tryParse(year.text) ?? DateTime.now().year,
+                vehicleType: type.text.trim(),
+                mileage: int.tryParse(mileage.text) ?? 0,
+                notes: notes.text.trim().isEmpty ? null : notes.text.trim(),
+              );
+              if (!context.mounted) {
+                return;
+              }
+              if (id != null) {
+                Navigator.of(context).pop(true);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Vehicle added.')),
+                );
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+
+    if (saved == true) {
+      await controller.refresh();
+    }
+  }
+
+  String? _req(String? value) {
+    return (value == null || value.trim().isEmpty) ? 'Required' : null;
+  }
+
+  Future<void> _openInspectionDetail(
+    BuildContext context,
+    InspectionSummaryModel summary,
+  ) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => InspectionDetailScreen(summary: summary),
+      ),
+    );
+  }
+}
+
 class _QuickActionsBar extends StatelessWidget {
   const _QuickActionsBar({this.onNewInspection, this.onSync, this.onRefresh});
+
   final VoidCallback? onNewInspection;
   final Future<void> Function()? onSync;
   final Future<void> Function()? onRefresh;
@@ -208,203 +493,33 @@ class _QuickActionsBar extends StatelessWidget {
   }
 }
 
-  Future<void> _startAssignmentInspection(
-    BuildContext context,
-    InspectorDashboardController controller,
-    VehicleAssignmentModel assignment,
-  ) async {
-    await _openInspectionForm(
-      context,
-      controller,
-      assignment: assignment,
-      initialVehicle: controller.vehicleById(assignment.vehicleId),
-    );
-  }
+class _MiniFab extends StatelessWidget {
+  const _MiniFab({required this.icon, required this.label, this.onTap});
 
-  Future<void> _startAdHocInspection(
-    BuildContext context,
-    InspectorDashboardController controller,
-  ) async {
-    await _openInspectionForm(context, controller);
-  }
+  final IconData icon;
+  final String label;
+  final VoidCallback? onTap;
 
-  Future<void> _openInspectionForm(
-    BuildContext context,
-    InspectorDashboardController controller, {
-    VehicleAssignmentModel? assignment,
-    VehicleModel? initialVehicle,
-  }) async {
-    final inspectorId = controller.inspectorProfileId;
-    if (inspectorId == null) {
-      await showDialog<void>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Inspector profile missing'),
-          content: const Text('Unable to determine your inspector profile. Please sync assignments or contact an administrator.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close'),
-            ),
-          ],
-        ),
-      );
-      return;
-    }
-    if (controller.categories.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Checklist categories not available. Try refreshing.')),
-      );
-      return;
-    }
-    final draft = await Navigator.of(context).push<InspectionDraftModel>(
-      MaterialPageRoute(
-        builder: (_) => InspectionFormScreen(
-          inspectorId: inspectorId,
-          categories: controller.categories,
-          vehicles: controller.vehicles,
-          assignment: assignment,
-          initialVehicle: initialVehicle,
-        ),
-      ),
-    );
-    if (draft == null) {
-      return;
-    }
-    final result = await controller.submitInspection(draft);
-    if (!context.mounted) return;
-    final messenger = ScaffoldMessenger.of(context);
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(
-          result.isSubmitted
-              ? 'Inspection submitted successfully.'
-              : 'Inspection saved offline and will sync when online.',
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFab(BuildContext context, InspectorDashboardController controller) {
-    if (controller.inspectorProfileId == null) return const SizedBox.shrink();
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (_fabOpen) ...[
-          _MiniFab(
-            icon: Icons.add_task,
-            label: 'New inspection',
-            onTap: controller.vehicles.isEmpty ? null : () => _startAdHocInspection(context, controller),
-          ),
-          const SizedBox(height: 10),
-          _MiniFab(
-            icon: Icons.sync,
-            label: controller.isSyncing ? 'Syncing…' : 'Sync offline',
-            onTap: controller.isSyncing
-                ? null
-                : () async {
-                    final processed = await controller.syncOfflineInspections();
-                    if (!context.mounted) return;
-                    final message = processed > 0
-                        ? 'Synced $processed inspection(s).'
-                        : 'No inspections waiting for sync.';
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-                  },
-          ),
-        ],
-        FloatingActionButton(
-          onPressed: () => setState(() => _fabOpen = !_fabOpen),
-          child: Icon(_fabOpen ? Icons.close : Icons.menu),
-        ),
-      ],
-    );
-  }
-
-  Future<void> _openAddVehicleDialog(
-    BuildContext context,
-    InspectorDashboardController controller,
-    int customerId,
-  ) async {
-    final vin = TextEditingController();
-    final plate = TextEditingController();
-    final make = TextEditingController();
-    final model = TextEditingController();
-    final year = TextEditingController(text: DateTime.now().year.toString());
-    final type = TextEditingController();
-    final mileage = TextEditingController(text: '0');
-    final notes = TextEditingController();
-
-    final formKey = GlobalKey<FormState>();
-
-    final saved = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add vehicle'),
-        content: Form(
-          key: formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(controller: plate, decoration: const InputDecoration(labelText: 'License plate'), validator: _req),
-                TextFormField(controller: vin, decoration: const InputDecoration(labelText: 'VIN'), validator: _req),
-                Row(children: [
-                  Expanded(child: TextFormField(controller: make, decoration: const InputDecoration(labelText: 'Make'), validator: _req)),
-                  const SizedBox(width: 12),
-                  Expanded(child: TextFormField(controller: model, decoration: const InputDecoration(labelText: 'Model'), validator: _req)),
-                ]),
-                Row(children: [
-                  Expanded(child: TextFormField(controller: year, decoration: const InputDecoration(labelText: 'Year'), keyboardType: TextInputType.number, validator: _req)),
-                  const SizedBox(width: 12),
-                  Expanded(child: TextFormField(controller: type, decoration: const InputDecoration(labelText: 'Vehicle type'), validator: _req)),
-                ]),
-                Row(children: [
-                  Expanded(child: TextFormField(controller: mileage, decoration: const InputDecoration(labelText: 'Mileage'), keyboardType: TextInputType.number)),
-                  const SizedBox(width: 12),
-                  Expanded(child: TextFormField(controller: notes, decoration: const InputDecoration(labelText: 'Notes'))),
-                ]),
-              ],
-            ),
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      elevation: 2,
+      borderRadius: BorderRadius.circular(24),
+      color: Theme.of(context).colorScheme.surface,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary),
+              const SizedBox(width: 8),
+              Text(label),
+            ],
           ),
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
-          FilledButton(
-            onPressed: () async {
-              if (!formKey.currentState!.validate()) return;
-              final id = await controller.createVehicle(
-                customerId: customerId,
-                vin: vin.text.trim(),
-                licensePlate: plate.text.trim(),
-                make: make.text.trim(),
-                model: model.text.trim(),
-                year: int.tryParse(year.text) ?? DateTime.now().year,
-                vehicleType: type.text.trim(),
-                mileage: int.tryParse(mileage.text) ?? 0,
-                notes: notes.text.trim().isEmpty ? null : notes.text.trim(),
-              );
-              if (!context.mounted) return;
-              if (id != null) {
-                Navigator.of(context).pop(true);
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vehicle added.')));
-              }
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
-    if (saved == true) {
-      await controller.refresh();
-    }
-  }
-
-  String? _req(String? v) => (v == null || v.trim().isEmpty) ? 'Required' : null;
-
-  Future<void> _openInspectionDetail(BuildContext context, InspectionSummaryModel summary) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => InspectionDetailScreen(summary: summary),
       ),
     );
   }
@@ -430,6 +545,7 @@ class _AssignmentCard extends StatelessWidget {
     final vehicleLabel = vehicle != null
         ? '${vehicle!.licensePlate} • ${vehicle!.make} ${vehicle!.model}'
         : 'Vehicle #${assignment.vehicleId}';
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -456,7 +572,7 @@ class _AssignmentCard extends StatelessWidget {
                     icon: const Icon(Icons.add),
                     label: const Text('Add vehicle'),
                   ),
-                const SizedBox(width: 8),
+                if (onAddVehicle != null) const SizedBox(width: 8),
                 FilledButton.icon(
                   onPressed: onStart,
                   icon: const Icon(Icons.assignment_turned_in),
@@ -483,9 +599,11 @@ class _InspectionListTile extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
-        title: Text(inspection.vehicle.licensePlate.isNotEmpty
-            ? '${inspection.vehicle.licensePlate} • ${inspection.vehicle.make} ${inspection.vehicle.model}'
-            : inspection.vehicle.vin),
+        title: Text(
+          inspection.vehicle.licensePlate.isNotEmpty
+              ? '${inspection.vehicle.licensePlate} • ${inspection.vehicle.make} ${inspection.vehicle.model}'
+              : inspection.vehicle.vin,
+        ),
         subtitle: Text('${inspection.statusDisplay} • ${DateFormat.yMMMd().format(inspection.createdAt)}'),
         trailing: Icon(Icons.chevron_right, color: statusColor),
         onTap: onTap,
