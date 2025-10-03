@@ -122,6 +122,7 @@ class _CustomerHomeView extends StatelessWidget {
                           ],
                         ),
                       ),
+                    ),
               ),
             ],
           ),
