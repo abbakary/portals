@@ -2,8 +2,8 @@
   <div class="section-header">
     <h2><i class="fa-solid fa-user-shield"></i> Inspectors</h2>
     <div class="section-actions">
-      <a class="btn btn-primary" href="/django-admin/portal/inspectorprofile/add/"><i class="fa-solid fa-plus"></i> Add</a>
-      <a class="btn" href="/django-admin/portal/inspectorprofile/"><i class="fa-solid fa-gear"></i> Manage</a>
+      <button class="btn btn-primary" hx-get="{% url 'portal-inspectors-new' %}" hx-target="#content"><i class="fa-solid fa-plus"></i> Add</button>
+      <button class="btn" hx-get="{% url 'portal-inspectors' %}" hx-target="#content"><i class="fa-solid fa-gear"></i> Refresh</button>
     </div>
   </div>
   <div class="table-responsive">
@@ -15,6 +15,7 @@
           <th>Badge</th>
           <th>Active</th>
           <th>Certifications</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -25,6 +26,13 @@
           <td>{{ i.badge_id }}</td>
           <td>{% if i.is_active %}<span class="status success">Active</span>{% else %}<span class="status muted">Inactive</span>{% endif %}</td>
           <td>{{ i.certifications }}</td>
+          <td>
+            <button class="btn" hx-get="{% url 'portal-inspectors-edit' i.id %}" hx-target="#content"><i class="fa-solid fa-pen"></i> Edit</button>
+            <form method="post" hx-post="{% url 'portal-inspectors-delete' i.id %}" hx-target="#content" style="display:inline-block">
+              {% csrf_token %}
+              <button class="btn" type="submit" onclick="return confirm('Delete this inspector?')"><i class="fa-solid fa-trash"></i> Delete</button>
+            </form>
+          </td>
         </tr>
         {% empty %}
         <tr><td colspan="5" class="muted">No inspectors.</td></tr>
