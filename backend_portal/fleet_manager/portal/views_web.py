@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpRequest, HttpResponse
 
-from .models import Customer, Vehicle, InspectorProfile, VehicleAssignment, Inspection, InspectionCategory
+from .models import Customer, Vehicle, InspectorProfile, VehicleAssignment, Inspection, InspectionCategory, ChecklistItem
 from .permissions import get_portal_profile, PortalUser
 from .forms import (
     CustomerForm,
