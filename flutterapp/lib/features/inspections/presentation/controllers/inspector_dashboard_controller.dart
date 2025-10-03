@@ -141,4 +141,8 @@ class InspectorDashboardController extends ChangeNotifier {
   void _setLoading(bool value) {
     _isLoading = value;
   }
+
+  bool _isSameDate(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
 }
