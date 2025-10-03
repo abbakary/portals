@@ -2,8 +2,9 @@
   <div class="section-header">
     <h2><i class="fa-solid fa-car"></i> Vehicles</h2>
     <div class="section-actions">
+      <input class="input search-input table-search" type="search" placeholder="Search…" aria-label="Search vehicles">
       <button class="btn btn-primary" hx-get="{% url 'portal-vehicles-new' %}" hx-target="#content"><i class="fa-solid fa-plus"></i> Add</button>
-      <button class="btn" hx-get="{% url 'portal-vehicles' %}" hx-target="#content"><i class="fa-solid fa-gear"></i> Refresh</button>
+      <button class="btn" hx-get="{% url 'portal-vehicles' %}" hx-target="#content"><i class="fa-solid fa-rotate"></i> Refresh</button>
     </div>
   </div>
   <div class="table-responsive">
@@ -34,7 +35,7 @@
             <button class="btn" hx-get="{% url 'portal-vehicles-edit' v.id %}" hx-target="#content"><i class="fa-solid fa-pen"></i> Edit</button>
             <form method="post" hx-post="{% url 'portal-vehicles-delete' v.id %}" hx-target="#content" style="display:inline-block">
               {% csrf_token %}
-              <button class="btn" type="submit" onclick="return confirm('Delete this vehicle?')"><i class="fa-solid fa-trash"></i> Delete</button>
+              <button class="btn" type="submit" data-confirm="Delete this vehicle?"><i class="fa-solid fa-trash"></i> Delete</button>
             </form>
           </td>
         </tr>

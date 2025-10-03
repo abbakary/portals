@@ -44,7 +44,8 @@ class InspectorDashboardController extends ChangeNotifier {
       final vehicles = await repository.fetchVehicles();
       final categories = await repository.fetchCategories();
       final inspections = await repository.fetchInspections();
-      _assignments = assignments;
+      final today = DateTime.now();
+      _assignments = assignments.where((a) => _isSameDate(a.scheduledFor, today)).toList();
       _vehicles = vehicles;
       _categories = categories;
       _recentInspections = inspections;
@@ -139,5 +140,9 @@ class InspectorDashboardController extends ChangeNotifier {
 
   void _setLoading(bool value) {
     _isLoading = value;
+  }
+
+  bool _isSameDate(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 }

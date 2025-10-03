@@ -2,8 +2,9 @@
   <div class="section-header">
     <h2><i class="fa-solid fa-calendar-check"></i> Assignments</h2>
     <div class="section-actions">
+      <input class="input search-input table-search" type="search" placeholder="Search…" aria-label="Search assignments">
       <button class="btn btn-primary" hx-get="{% url 'portal-assignments-new' %}" hx-target="#content"><i class="fa-solid fa-plus"></i> Add</button>
-      <button class="btn" hx-get="{% url 'portal-assignments' %}" hx-target="#content"><i class="fa-solid fa-gear"></i> Refresh</button>
+      <button class="btn" hx-get="{% url 'portal-assignments' %}" hx-target="#content"><i class="fa-solid fa-rotate"></i> Refresh</button>
     </div>
   </div>
   <div class="table-responsive">
@@ -32,7 +33,7 @@
             <button class="btn" hx-get="{% url 'portal-assignments-edit' a.id %}" hx-target="#content"><i class="fa-solid fa-pen"></i> Edit</button>
             <form method="post" hx-post="{% url 'portal-assignments-delete' a.id %}" hx-target="#content" style="display:inline-block">
               {% csrf_token %}
-              <button class="btn" type="submit" onclick="return confirm('Delete this assignment?')"><i class="fa-solid fa-trash"></i> Delete</button>
+              <button class="btn" type="submit" data-confirm="Delete this assignment?"><i class="fa-solid fa-trash"></i> Delete</button>
             </form>
           </td>
         </tr>

@@ -522,8 +522,8 @@ class _ChecklistItemEditor extends StatelessWidget {
             ),
             onChanged: onNotesChanged,
             validator: (value) {
-              if (requiresPhoto && photos.isEmpty && (value == null || value.trim().isEmpty) && response.result == InspectionItemResponse.RESULT_FAIL) {
-                return 'Provide context when photo is missing.';
+              if (response.result == InspectionItemResponse.RESULT_FAIL && photos.isEmpty) {
+                return 'Photo evidence is required for failures.';
               }
               return null;
             },

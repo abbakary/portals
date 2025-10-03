@@ -52,17 +52,20 @@ class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.select_related("profile", "profile__user").all()
     serializer_class = CustomerSerializer
     permission_classes = [IsAuthenticated, IsAdmin]
+    pagination_class = None
 
 
 class InspectorProfileViewSet(viewsets.ModelViewSet):
     queryset = InspectorProfile.objects.select_related("profile", "profile__user").all()
     serializer_class = InspectorProfileSerializer
     permission_classes = [IsAuthenticated, IsAdmin]
+    pagination_class = None
 
 
 class VehicleViewSet(viewsets.ModelViewSet):
     serializer_class = VehicleSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = None
 
     def get_queryset(self):
         profile = get_portal_profile(self.request.user)
@@ -90,6 +93,7 @@ class VehicleViewSet(viewsets.ModelViewSet):
 class VehicleAssignmentViewSet(viewsets.ModelViewSet):
     serializer_class = VehicleAssignmentSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = None
 
     def get_queryset(self):
         profile = get_portal_profile(self.request.user)
@@ -117,6 +121,7 @@ class VehicleAssignmentViewSet(viewsets.ModelViewSet):
 
 class InspectionViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
+    pagination_class = None
     parser_classes = [MultiPartParser, FormParser, JSONParser]
     queryset = Inspection.objects.select_related(
         "vehicle",
@@ -183,9 +188,11 @@ class InspectionCategoryViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = InspectionCategory.objects.prefetch_related("items")
     serializer_class = InspectionCategorySerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class ChecklistItemViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = ChecklistItem.objects.filter(is_active=True).select_related("category")
     serializer_class = ChecklistItemSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
