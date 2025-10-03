@@ -66,6 +66,33 @@ class _DetailView extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        if (detail.customerReport != null) ...[
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Customer summary', style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 8),
+                  Text(detail.customerReport!.summary),
+                  if (detail.customerReport!.recommendedActions.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Text('Recommended actions', style: Theme.of(context).textTheme.titleSmall),
+                    const SizedBox(height: 4),
+                    Text(detail.customerReport!.recommendedActions),
+                  ],
+                  if (detail.customerReport!.publishedAt != null) ...[
+                    const SizedBox(height: 8),
+                    Text('Published: ${DateFormat.yMMMd().add_jm().format(detail.customerReport!.publishedAt!)}',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
         Card(
           child: Padding(
             padding: const EdgeInsets.all(16),
