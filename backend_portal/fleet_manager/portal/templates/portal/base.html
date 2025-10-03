@@ -4,7 +4,7 @@
   {% load static %}
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Fleet Manager Admin</title>
+  <title>SUPERDOLL Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -17,8 +17,8 @@
   <div class="layout light">
     <aside class="sidebar light">
       <div class="brand">
-        <i class="fa-solid fa-truck"></i>
-        <span>Fleet Admin</span>
+        <img class="logo" src="https://cdn.builder.io/api/v1/image/assets%2F355be5b4e94646fd936865c55409a47d%2F4f0fc8404f3243dfb843eec7307236f1?format=webp&width=800" alt="SUPERDOLL logo" />
+        <span>SUPERDOLL</span>
       </div>
       <nav class="menu" id="sidebar-menu">
         <a href="{% url 'portal-app' %}" hx-get="{% url 'portal-customers' %}" hx-target="#content" hx-push-url="true" data-route="/app/customers/">
