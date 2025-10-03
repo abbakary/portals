@@ -27,6 +27,8 @@ body.dark .menu a.active{background:#172554;color:#bfdbfe}
 .sidebar.light{}
 .brand{display:flex;align-items:center;gap:.6rem;padding:18px 16px;font-weight:700;border-bottom:1px solid var(--panel-border)}
 .brand i{color:var(--primary)}
+.brand .logo{height:28px;display:block}
+@media (min-width: 720px){.brand .logo{height:30px}}
 .menu{display:flex;flex-direction:column;padding:8px}
 .menu a{display:flex;align-items:center;gap:.8rem;color:var(--text);text-decoration:none;padding:10px 12px;border-radius:10px}
 .menu a:hover{background:#eff6ff}
